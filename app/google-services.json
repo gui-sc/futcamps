@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "134655087707",
+    "firebase_url": "https://futcamps-b64e7.firebaseio.com",
+    "project_id": "futcamps-b64e7",
+    "storage_bucket": "futcamps-b64e7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:134655087707:android:a8e1350cbc1e572cf95b7e",
+        "android_client_info": {
+          "package_name": "com.example.ehcomplicado"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "134655087707-jrf8geiq87ggvnqes5hdj6q80t3d13n1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi0HJR9QEdlj13G5aDltEPX6By-TeO4aM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "134655087707-jrf8geiq87ggvnqes5hdj6q80t3d13n1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

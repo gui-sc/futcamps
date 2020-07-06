@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/btn_ant"
+        android:title="@string/ftc_ant_abrev"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/btn_prox"
+        android:title="@string/ftc_prox_abrev"
+        app:showAsAction="always" />
+</menu>

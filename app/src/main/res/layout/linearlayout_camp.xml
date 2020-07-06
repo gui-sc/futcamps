@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fundo3"
+        android:padding="10dp">
+
+
+        <LinearLayout
+            android:id="@+id/starLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/postAuthorLayout"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/postAuthorLayout"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_alignParentEnd="true">
+
+            <TextView
+                android:id="@+id/txtSituacao"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:text="@string/ftc_nao_ini"
+                />
+
+        </LinearLayout>
+
+        <include layout="@layout/include_post_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="5dp" />
+
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

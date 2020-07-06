@@ -1,0 +1,234 @@
+<resources>
+    <string name="app_name" translatable="false">FutCamps</string>
+    <string name="formato_prompt">formato</string>
+    <string name="fasedegrupos">Fase de Grupos + Mata-Mata</string>
+    <string name="matamata">Mata-Mata</string>
+    <string-array name="formato">
+        <item>@string/formato_prompt</item>
+        <item>@string/fasedegrupos</item>
+        <item>@string/matamata</item>
+    </string-array>
+    <string name="nome">Nome:</string>
+    <string name="formato">Formato:*</string>
+    <string name="numtimes">Número de Times</string>
+    <string-array name="numTimes">
+        <item>Número de Times</item>
+        <item>6</item>
+        <item>8</item>
+        <item>10</item>
+        <item>12</item>
+        <item>16</item>
+    </string-array>
+    <string name="doisgrupos">Dois Grupos</string>
+    <string name="quatrogrupos">Quatro Grupos</string>
+    <string name="grupos">Grupos</string>
+    <string-array name="seisTimes">
+        <item>@string/grupos</item>
+        <item>@string/doisgrupos</item>
+    </string-array>
+
+    <string-array name="oitoTimes">
+        <item>@string/grupos</item>
+        <item>@string/doisgrupos</item>
+    </string-array>
+
+    <string-array name="dezTimes">
+        <item>@string/grupos</item>
+        <item>@string/doisgrupos</item>
+    </string-array>
+
+    <string-array name="dozeTimes">
+        <item>@string/grupos</item>
+        <item>@string/doisgrupos</item>
+        <item>@string/quatrogrupos</item>
+    </string-array>
+
+    <string-array name="dezesseisTimes">
+        <item>@string/grupos</item>
+        <item>@string/doisgrupos</item>
+        <item>@string/quatrogrupos</item>
+    </string-array>
+
+    <string name="ftc_ok">OK</string>
+    <string name="ftc_cancelar">Cancelar</string>
+    <string name="ftc_novo_camp">Novo Campeonato</string>
+    <string name="ftc_hint_nome">Nome</string>
+    <string name="ftc_hint_cidade">Cidade</string>
+    <string name="ftc_hint_premiacao">Premiação</string>
+    <string name="ftc_aviso_vazio">Esse campo deve ser preenchido!</string>
+    <string name="ftc_cadastro_time">Cadastro de Time</string>
+    <string name="ftc_cabeca_de_chave">Cabeça de Chave</string>
+    <string name="ftc_cadastro_jogador">Cadastro de Jogador</string>
+    <string name="ftc_lbl_time">Time:</string>
+    <string name="ftc_salvar">Salvar</string>
+    <string name="ftc_camp_salvos" translatable="false">Home</string>
+    <string name="ftc_atualizar">Atualizar</string>
+    <string name="ftc_apagar">Apagar</string>
+    <string name="ftc_editar">Editar</string>
+    <string name="ftc_voltar">Voltar</string>
+    <string name="ftc_editar_campeonato">Editar Campeonato</string>
+    <string name="ftc_editar_time">Editar time</string>
+    <string name="ftc_apagar_time">apagar time</string>
+    <string name="ftc_editar_jogador">Editar Jogador</string>
+    <string name="ftc_apagar_jogador">apagar jogador</string>
+    <string name="ftc_adicionar">Adicionar</string>
+    <string name="ftc_adicionar_jogador">Adicionar Jogador</string>
+    <string name="ftc_hint_apelido">Apelido</string>
+    <string name="ftc_hint_n_documento">CPF</string>
+    <string name="ftc_excluir">excluir</string>
+    <string name="ftc_fase_de_grupos">Fase de Grupos</string>
+    <string name="ftc_jogos">Jogos</string>
+    <string name="ftc_artilheiros">Artilheiros</string>
+    <string name="ftc_suspensos">Suspensos</string>
+    <string name="ftc_pendurados">Pendurados</string>
+    <string name="ftc_nova_partida">Nova Partida</string>
+    <string name="ftc_hint_estadio">Estádio</string>
+    <string name="ftc_data" translatable="false">Data</string>
+    <string name="ftc_gols">Gols</string>
+    <string name="ftc_cartoes_amarelos">Amarelos</string>
+    <string name="ftc_cartoes_vermelhos">Vermelhos</string>
+    <string name="ftc_selecione">Selecione</string>
+    <string name="ftc_observacoes">Observações</string>
+    <string name="ftc_cadastrar">Cadastrar</string>
+    <string name="ftc_sumula">Súmula</string>
+    <string name="ftc_oitavas_de_final">Oitavas de Final</string>
+    <string name="ftc_quartas_de_final">Quartas de Final</string>
+    <string name="ftc_semi_finais">Semi-Finais</string>
+    <string name="ftc_final" translatable="false">Final</string>
+    <string name="ftc_resultados">Resultados</string>
+    <string name="ftc_campeao">Campeão:</string>
+    <string name="ftc_vice_campeao">Vice:</string>
+    <string name="ftc_artilheiro">Artilheiro:</string>
+    <string name="ftc_gol">Gols:</string>
+    <string name="ftc_hint_responsavel">Responsável</string>
+    <string name="ftc_num_times">Número de Times</string>
+    <string name="ftc_hint_idade">Idade</string>
+    <string name="ftc_andamento">Em Andamento</string>
+    <string name="ftc_finalizado">Finalizado</string>
+    <string name="ftc_nao_iniciado">Não Iniciado</string>
+    <string name="ftc_aviso">Compartilhe seu Campeonato! Copie o código e envie para seus amigos!</string>
+    <string name="ftc_seguindo">Seguindo</string>
+    <string name="ftc_pesquisar">Buscar</string>
+    <string name="ftc_seguir">Clique na estrela para seguir um campeonato!</string>
+    <string name="ftc_data_de_nascimento">Data de Nascimento</string>
+    <string name="ftc_prox">Próximo</string>
+    <string name="ftc_aviso_partida">Clique no placar para aumentar. Segure para zerar.</string>
+    <string name="rodada1">Rodada 1</string>
+    <string name="rodada2">Rodada 2</string>
+    <string name="rodada3">Rodada 3</string>
+    <string name="rodada4">Rodada 4</string>
+    <string name="rodada5">Rodada 5</string>
+    <string name="rodada6">Rodada 6</string>
+    <string name="rodada7">Rodada 7</string>
+    <string name="oitavas">Oitavas</string>
+    <string name="Quartas">Quartas</string>
+    <string name="Semi">Semi</string>
+    <string name="Final" translatable="false">Final</string>
+    <string name="ftc_menor" translatable="false"><![CDATA[<]]></string>
+    <string name="ftc_maior" translatable="false"><![CDATA[>]]></string>
+    <string name="default_notification_channel_id" translatable="false">CHANNEL_ID</string>
+    <string name="ftc_td_ok">Tudo Pronto</string>
+    <string name="ftc_em_and">Em Andamento</string>
+    <string name="ftc_nao_ini">Não Iniciado</string>
+    <string name="title_activity_main" translatable="false">FutCamps</string>
+    <string name="ftc_encerrar">Cancelar</string>
+    <string name="ftc_prox_abrev">Próx.</string>
+    <string name="ftc_ant_abrev">Ant.</string>
+    <string name="ftc_premiacao_perg">Haverá Premiação?</string>
+    <string name="ftc_nao">Não</string>
+    <string name="ftc_sim">Sim</string>
+    <string name="ftc_class_grupo">Classificados por Grupo</string>
+    <string name="ftc_nome">Nome:</string>
+    <string name="ftc_classi_grupo">Classif. p/ grupo:*</string>
+    <string name="ftc_num_grupos">Núm. Grupos:*</string>
+    <string name="ftc_num_times_abrev">Núm. Times:*</string>
+    <string name="premiacao">Premiação:</string>
+    <string name="cidade">Cidade:</string>
+    <string name="ftc_aviso_cadastro">* Essas informações não poderão ser alteradas posteriormente.</string>
+    <string name="ftc_alterar">Alterar</string>
+    <string name="ftc_revisar">Revisar</string>
+    <string name="jogador">Jogador</string>
+    <string name="time">Time</string>
+    <string name="gols">Gols</string>
+    <string name="cabe_a_de_chave">Cabeça de Chave</string>
+    <string name="times">Times</string>
+    <string name="jogadores">Jogadores</string>
+    <string name="x" translatable="false">X</string>
+    <string name="descri_o" translatable="false">Descrição</string>
+    <string name="_0" translatable="false">0</string>
+    <string name="medalha1" translatable="false">medalha</string>
+    <string name="medalha2" translatable="false">medalha2</string>
+    <string name="boneco" translatable="false">boneco</string>
+    <string name="bola" translatable="false">bola</string>
+    <string name="time_maiusculo">TIME</string>
+    <string name="pts">PTS</string>
+    <string name="sg">SG</string>
+    <string name="gp">GP</string>
+    <string name="obs" translatable="false">Obs:</string>
+    <string name="pesquisar">Pesquisar</string>
+    <string name="zerar_cart_es">Zerar Cartões:*</string>
+    <string name="zerar_nas_fases">Zerar cartões nas fases:</string>
+    <string name="_2" translatable="false">2</string>
+    <string name="ftc_perg_pendurados">Suspensão com quantos amarelos?</string>
+    <string name="amarelos_pra_suspens_o">Amarelos pra suspensão:*</string>
+    <string name="ftc_criar_camp">Criar Campeonato</string>
+    <string name="ftc_encerrar_sessao">Encerrar Sessão</string>
+    <string name="ftc_continuar_cadast">Cadastro dos Times</string>
+    <string name="ftc_excluir_campeonato">Excluir Campeonato</string>
+    <string name="ftc_excluir_time">Excluir Time</string>
+    <string name="ftc_chaveamento">Chaveamento</string>
+    <string name="ftc_inserindo">Inserindo Jogador…</string>
+    <string name="ftc_inserido">Jogador inserido com sucesso!</string>
+    <string name="ftc_sem_premiacao">Sem Premiação</string>
+    <string name="ftc_ano">Ano</string>
+    <string name="ftc_aviso_ano">Por favor, escolha o ano</string>
+    <string name="ftc_aviso_formato">Por favor, defina um formato!</string>
+    <string name="ftc_aviso_num_times">Por favor, escolha o número de times!</string>
+    <string name="ftc_aviso_num_grupos">Por favor, escolha o número de grupos</string>
+    <string name="ftc_aviso_classificados">Por favor, escolha o número de times classificados</string>
+    <string name="ftc_aviso_classificados2">O número de classificados de um grupo não pode ser maior que o total de times presentes nesse grupo…</string>
+    <string name="ftc_perg_sessao">Deseja Sair?</string>
+    <string name="ftc_busca_codigo">Buscar por Código</string>
+    <string name="ftc_aviso_campeonato">Esse campeonato ainda não está pronto…</string>
+    <string name="ftc_aviso_cabeca">Limite de cabeças de chave atingido!</string>
+    <string name="ftc_aviso_time_cabeca">Esse time deve ser um cabeça de chave…</string>
+    <string name="ftc_cadastrando">Cadastrando…</string>
+    <string name="ftc_grupos_min">grupos</string>
+    <string name="ftc_sucesso">Sucesso!</string>
+    <string name="ftc_acao_inexperada">Ação Inexperada</string>
+    <string name="ftc_aviso_acao_inexperada">Você não pode realizar esta ação…</string>
+    <string name="ftc_amarelo">Amarelos</string>
+    <string name="ftc_certeza">Tem certeza?</string>
+    <string name="ftc_jogador_alterado">Jogador alterado com sucesso!</string>
+    <string name="campeonatoAlterado">Campeonato alterado com sucesso!</string>
+    <string name="codigoCopiado">Código copiado!</string>
+    <string name="codigo">Código</string>
+    <string name="timeAlterado">Time alterado com sucesso!</string>
+    <string name="partidaNaoCadastrada">Essa partida ainda não foi cadastrada…</string>
+    <string name="partidaCadastrada">Partida cadastrada com sucesso!</string>
+    <string name="avisoPenaltis">Cadastre os pênaltis…</string>
+    <string name="avisoPenaltisEmpate">Os pênaltis não podem empatar</string>
+    <string name="certezaPartida">Tem Certeza? Você não poderá alterar esses dados depois.</string>
+    <string name="cadastrar">Cadastrar</string>
+    <string name="grupoEspaco">Grupo </string>
+    <string name="oitavasQuartasSemi">Oitavas, quartas e semi</string>
+    <string name="oitavasQuartas">Oitavas e quartas</string>
+    <string name="quartasSemi">Quartas e semi</string>
+    <string name="erro">Erro!</string>
+    <string name="cadastrado">Cadastrado!</string>
+    <string name="revisao">Revisão</string>
+    <string name="avisoCampeonato">Esse campeonato ainda não está pronto…</string>
+    <string name="vermelhos">Vermelhos</string>
+    <string name="esqueceu_sua_senha">Esqueceu sua senha?</string>
+    <string name="nova_conta">Nova Conta</string>
+    <string name="entrar">entrar</string>
+    <string name="senha">Senha</string>
+    <string name="email" translatable="false">Email</string>
+    <string name="ja_tem_uma_conta">Já tem uma conta?</string>
+    <string name="criar_conta">Criar Conta</string>
+    <string name="pedidoEmail">Digite um email…</string>
+    <string name="pedidoSenha">Digite uma senha…</string>
+    <string name="nome_de_usuario">Nome de Usuário</string>
+    <string name="enviar_email">Enviar Email</string>
+    <string name="faseDeGrupos">Grupos</string>
+</resources>

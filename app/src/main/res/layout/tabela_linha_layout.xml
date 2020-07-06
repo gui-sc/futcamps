@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linha_tabela_times"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <TextView
+        android:id="@+id/nome"
+        android:layout_column="1"
+        android:textSize="20sp"
+        android:padding="5dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textColor="@android:color/white"/>
+    <TextView
+        android:id="@+id/pts"
+        android:layout_column="2"
+        android:textSize="20sp"
+        android:padding="5dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textColor="@android:color/white"/>
+    <TextView
+        android:id="@+id/sg"
+        android:layout_column="1"
+        android:textSize="20sp"
+        android:padding="5dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textColor="@android:color/white"/>
+    <TextView
+        android:id="@+id/gp"
+        android:layout_column="2"
+        android:textSize="20sp"
+        android:padding="5dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textColor="@android:color/white"/>
+
+
+</TableRow>
