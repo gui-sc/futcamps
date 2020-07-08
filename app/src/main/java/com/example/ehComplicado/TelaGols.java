@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import model.bean.Campeonato;
@@ -86,8 +87,18 @@ public class TelaGols extends AppCompatActivity {
         jogadorReference = FirebaseDatabase.getInstance().getReference()
                 .child("time-jogadores").child(partida.getIdVisitante());
         jogadorHelperTime2 = new JogadorHelper(jogadorReference);
-        List<Jogador> primeiraLista1 = jogadorHelperTime1.retrive();
-        List<Jogador> primeiraLista2 = jogadorHelperTime2.retrive();
+        List<Jogador> primeiraLista1 = new ArrayList<>();
+        List<Jogador> primeiraLista2 = new ArrayList<>();
+        Jogador golContraMandante = new Jogador();
+        golContraMandante.setApelido("Gol contra");
+        Jogador golContraVisitante = new Jogador();
+        golContraVisitante.setApelido("Gol contra");
+        golContraMandante.setTime(partida.getMandante());
+        golContraVisitante.setTime(partida.getVisitante());
+        primeiraLista1.add(golContraMandante);
+        primeiraLista2.add(golContraVisitante);
+        primeiraLista1.addAll(jogadorHelperTime1.retrive());
+        primeiraLista2.addAll(jogadorHelperTime2.retrive());
         final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(this, R.layout.personalizado_list_item, primeiraLista1);
         final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(this, R.layout.personalizado_list_item, primeiraLista2);
         final ArrayAdapter<Jogador> gols = new ArrayAdapter<>(this, R.layout.personalizado_list_item);
@@ -172,11 +183,17 @@ public class TelaGols extends AppCompatActivity {
                         Gols gol = new Gols();
                         Jogador jogador = (Jogador) lstGols.getItemAtPosition(i);
                         jogador = jogadorDAO.configurar(times, jogador);
-                        jogador.setGols(jogador.getGols() + 1);
-                        gol.setJogador(jogador.getApelido());
-                        gol.setTime(jogador.getTime().getNome());
-                        golDAO.inserir(gol, partida.getId());
-                        jogadorDAO.atualizar(jogador, jogador.getIdTime(), campKey);
+                        if (!jogador.getApelido().equals("Gol contra")) {
+                            jogador.setGols(jogador.getGols() + 1);
+                            gol.setJogador(jogador.getApelido());
+                            gol.setTime(jogador.getTime().getNome());
+                            golDAO.inserir(gol, partida.getId());
+                            jogadorDAO.atualizar(jogador, jogador.getIdTime(), campKey);
+                        } else {
+                            gol.setJogador(jogador.getApelido());
+                            gol.setTime(jogador.getTime().getNome());
+                            golDAO.inserir(gol,partida.getId());
+                        }
                     }
                     Intent it = new Intent(TelaGols.this, TelaCartoes.class);
                     it.putExtra("user", user);

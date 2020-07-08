@@ -183,7 +183,7 @@ public class PartidaDAO {
     }
 
     public void cadastrarPrevia(Partida partida, String campKey) {
-        String key = partidaReference.child("partidas").push().getKey();
+        String key = partidaReference.child("campeonato-partidas").child(campKey).push().getKey();
         partida.setId(key);
         partida.setIdMandante(partida.getMandante().getId());
         partida.setIdVisitante(partida.getVisitante().getId());
