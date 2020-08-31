@@ -3,9 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:weightSum="10"
     android:background="@drawable/fundoestadio"
-    tools:context=".TelaBuscar">
+    tools:context=".BuscarFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,11 +18,51 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
+            app:title="Buscar"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             android:layout_marginBottom="10dp"
             />
-        <include layout="@layout/info_block2"/>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/nome_text_input"
+            style="@style/Widget.Futcamps.TextInputLayout"
+            android:layout_width="300dp"
+            android:layout_height="70dp"
+            android:layout_margin="4dp"
+            android:hint="@string/ftc_busca_codigo"
+            app:errorEnabled="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.414"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.104">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/nome_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textColor="@android:color/white" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/btnBuscar"
+            style="@style/Widget.Futcamps.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:text="Buscar"
+            android:textSize="20sp" />
+        </RelativeLayout>
         <ListView
             android:id="@+id/lst_camp"
             android:layout_width="match_parent"

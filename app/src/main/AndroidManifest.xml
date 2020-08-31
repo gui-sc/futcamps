@@ -3,164 +3,176 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.ehComplicado">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.INTERNET" />
 
-    <application
-        android:name="com.example.ehComplicado.customApplication"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/MeuTheme">
-        <activity android:name="com.example.ehComplicado.TelaRecuperarSenha"></activity>
-        <activity android:name="com.example.ehComplicado.TelaCriarConta" />
-        <activity android:name="com.example.ehComplicado.TelaRevisao" />
+  <application
+      android:name=".customApplication"
+      android:allowBackup="true"
+      android:icon="@mipmap/ic_launcher"
+      android:label="@string/app_name"
+      android:roundIcon="@mipmap/ic_launcher_round"
+      android:supportsRtl="true"
+      android:theme="@style/MeuTheme">
+    <activity
+        android:name=".TelaPrincipalJogos"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
 
-        <service android:name="com.example.ehComplicado.FirebaseMessageReceiver">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
+    <activity
+        android:name=".TelaPrincipalTimes"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaCamps"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".HomeFragment"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaRecuperarSenha"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaCriarConta"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaRevisao"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
 
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/oie_transparent" />
+    <service android:name=".FirebaseMessageReceiver">
+      <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+      </intent-filter>
+    </service>
 
-        <activity
-            android:name="com.example.ehComplicado.TelaVermelhos"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaCartoes"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaGols"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaBuscar"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaSeguindo"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity android:name="com.example.ehComplicado.Tela" />
-        <activity
-            android:name="com.example.ehComplicado.MainActivity"
-            android:label="@string/title_activity_main"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            tools:ignore="LockedOrientationActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_icon"
+        android:resource="@drawable/oie_transparent" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="com.example.ehComplicado.TelaCadastroTime"
-            android:launchMode="singleTop"
-            android:parentActivityName="com.example.ehComplicado.MainActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaNovoCamp"
-            android:parentActivityName="com.example.ehComplicado.MainActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaCadastroJogador"
-            android:parentActivityName="com.example.ehComplicado.TelaCadastroTime"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaQuatroGrupos"
-            android:parentActivityName="com.example.ehComplicado.MainActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaOitavas"
-            android:parentActivityName="com.example.ehComplicado.MainActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaQuartas"
-            android:parentActivityName="com.example.ehComplicado.MainActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaSemi"
-            android:parentActivityName="com.example.ehComplicado.MainActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaEditarCamp"
-            android:launchMode="singleTop"
-            android:parentActivityName="com.example.ehComplicado.TelaCarregarCamp"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaAdicionarJogador"
-            android:parentActivityName="com.example.ehComplicado.TelaEditarTime"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaEditarJogador"
-            android:parentActivityName="com.example.ehComplicado.TelaEditarTime"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaEditarTime"
-            android:launchMode="singleTop"
-            android:parentActivityName="com.example.ehComplicado.TelaEditarCamp"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaPendurados"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaSuspensos"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaFinal"
-            android:parentActivityName="com.example.ehComplicado.MainActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaArtilheiros"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaSumula"
-            android:parentActivityName="com.example.ehComplicado.TelaJogos"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaNovaPartida"
-            android:parentActivityName="com.example.ehComplicado.TelaJogos"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaJogos"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaPremios"
-            android:parentActivityName="com.example.ehComplicado.MainActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.example.ehComplicado.TelaCarregarCamp"
-            android:parentActivityName="com.example.ehComplicado.MainActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity android:name="com.example.ehComplicado.BaseActivity" />
-    </application>
+    <activity
+        android:name=".TelaVermelhos"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaCartoes"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaGols"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaSeguindo"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity android:name=".Tela" />
+    <activity
+        android:name=".MainActivity"
+        android:label="@string/title_activity_main"
+        android:screenOrientation="portrait"
+        android:theme="@style/AppTheme.NoActionBar"
+        tools:ignore="LockedOrientationActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+    <activity
+        android:name=".TelaCadastroTime"
+        android:launchMode="singleTop"
+        android:parentActivityName=".MainActivity"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaCadastroJogador"
+        android:parentActivityName=".TelaCadastroTime"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaQuatroGrupos"
+        android:parentActivityName=".MainActivity"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaOitavas"
+        android:parentActivityName=".MainActivity"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaQuartas"
+        android:parentActivityName=".MainActivity"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaSemi"
+        android:parentActivityName=".MainActivity"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaEditarCamp"
+        android:launchMode="singleTop"
+        android:parentActivityName=".TelaCarregarCamp"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaEditarJogador"
+        android:parentActivityName=".TelaEditarTime"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaEditarTime"
+        android:launchMode="singleTop"
+        android:parentActivityName=".TelaEditarCamp"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaPendurados"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaSuspensos"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaFinal"
+        android:parentActivityName=".MainActivity"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaArtilheiros"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaSumula"
+        android:parentActivityName=".TelaJogos"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaNovaPartida"
+        android:parentActivityName=".TelaJogos"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaJogos"
+        android:launchMode="singleTop"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaPremios"
+        android:parentActivityName=".MainActivity"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name=".TelaCarregarCamp"
+        android:parentActivityName=".MainActivity"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
+    <activity android:name=".BaseActivity" />
+  </application>
 
 </manifest>

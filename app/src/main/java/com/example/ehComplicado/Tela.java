@@ -7,6 +7,8 @@ import android.os.Bundle;
 
 import com.google.firebase.auth.FirebaseUser;
 
+import model.bean.Campeonato;
+
 public class Tela extends AppCompatActivity {
 
     @Override
@@ -15,9 +17,9 @@ public class Tela extends AppCompatActivity {
         setContentView(R.layout.activity_tela);
         FirebaseUser user = getIntent().getParcelableExtra("user");
         String key = getIntent().getStringExtra("key");
-        String campKey = getIntent().getStringExtra("campKey");
+        Campeonato camp = getIntent().getParcelableExtra("camp");
         if ("jogos".equals(key)) {
-            startActivity(new Intent(Tela.this, TelaJogos.class).putExtra("user", user).putExtra("campKey", campKey));
+            startActivity(new Intent(Tela.this, TelaPrincipalJogos.class).putExtra("camp", camp));
             finish();
         }
     }

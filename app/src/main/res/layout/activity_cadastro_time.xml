@@ -5,31 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fundograma2"
-    tools:context=".TelaAdicionarJogador">
+    tools:context=".TelaCadastroTime">
+
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:title="@string/ftc_cadastro_time"
         android:background="@color/colorPrimary"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
-
-    <TextView
-        android:id="@+id/lbl_time"
-        android:layout_width="180dp"
-        android:layout_height="30dp"
-        android:text="@string/ftc_lbl_time"
-        android:textColor="@android:color/white"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.112"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.105" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/nome_text_input"
@@ -41,10 +29,10 @@
         app:errorEnabled="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.234"
+        app:layout_constraintHorizontal_bias="0.414"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.188">
+        app:layout_constraintVertical_bias="0.104">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/nome_edit_text"
@@ -59,23 +47,23 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/apelido_text_input"
+        android:id="@+id/dirigente_text_input"
         style="@style/Widget.Futcamps.TextInputLayout"
         android:layout_width="300dp"
         android:layout_height="80dp"
         android:layout_margin="4dp"
-
-        android:hint="@string/ftc_hint_apelido"
+        android:hint="@string/ftc_hint_responsavel"
         app:errorEnabled="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.234"
+
+        app:layout_constraintHorizontal_bias="0.423"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.356">
+        app:layout_constraintVertical_bias="0.282">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/apelido_edit_text"
+            android:id="@+id/dirigente_edit_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="20dp"
@@ -87,31 +75,58 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/idade_text_input"
+        android:id="@+id/cidade_text_input"
         style="@style/Widget.Futcamps.TextInputLayout"
         android:layout_width="300dp"
         android:layout_height="80dp"
         android:layout_margin="4dp"
-        android:hint="@string/ftc_data_de_nascimento"
+        android:hint="@string/ftc_hint_cidade"
         app:errorEnabled="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.252"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.52">
+        app:layout_constraintVertical_bias="0.456">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/idade_edit_text"
+            android:id="@+id/cidade_edit_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:inputType="date"
+            android:inputType="text"
             android:maxLines="1"
             android:textColor="@android:color/white" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <Switch
+        android:id="@+id/sw_cabecaDeChave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/cabe_a_de_chave"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.244"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.572" />
 
+
+    <Button
+        android:id="@+id/salvar_button"
+        style="@style/Widget.Futcamps.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ftc_salvar"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.57" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/editar_button"
+        android:title="Editar"
+        android:icon="@drawable/edit_24px"/>
+    <item android:id="@+id/jogadores_button"
+        android:title="Jogadores"
+        android:icon="@drawable/camisa"/>
+    <item android:id="@+id/voltar_button"
+        android:title="Voltar"
+        android:icon="@drawable/back_32px"/>
+</menu>

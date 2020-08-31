@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/fundograma2"
     tools:context=".TelaArtilheiros">
 
@@ -13,51 +14,52 @@
         android:clipToPadding="false"
         android:orientation="vertical">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:layout_marginBottom="40dp"/>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            app:title="@string/ftc_artilheiros"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:layout_marginBottom="40dp"/>
 
-    <TableLayout
-        android:id="@+id/tabela_artilheiros"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="100dp"
-        android:stretchColumns="*">
+        <TableLayout
+            android:id="@+id/tabela_artilheiros"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="100dp"
+            android:stretchColumns="*">
 
-        <TableRow>
+            <TableRow>
 
-            <TextView
-                android:layout_column="1"
-                android:padding="3dp"
-                android:text="@string/jogador"
-                android:textColor="@android:color/white"
-                android:textSize="20sp" />
+                <TextView
+                    android:layout_column="1"
+                    android:padding="3dp"
+                    android:text="@string/jogador"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
 
-            <TextView
-                android:layout_column="2"
-                android:padding="3dp"
-                android:text="@string/time"
-                android:textColor="@android:color/white"
-                android:textSize="20sp" />
+                <TextView
+                    android:layout_column="2"
+                    android:padding="3dp"
+                    android:text="@string/time"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
 
-            <TextView
-                android:layout_column="3"
-                android:padding="3dp"
-                android:text="@string/gols"
-                android:textColor="@android:color/white"
-                android:textSize="20sp" />
-        </TableRow>
+                <TextView
+                    android:layout_column="3"
+                    android:padding="3dp"
+                    android:text="@string/gols"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
+            </TableRow>
 
-        <View
-            android:layout_height="2dip"
-            android:background="#FF909090" />
+            <View
+                android:layout_height="2dip"
+                android:background="#FF909090" />
 
-    </TableLayout>
+        </TableLayout>
 
     </LinearLayout>
 </ScrollView>

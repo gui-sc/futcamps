@@ -73,6 +73,8 @@ public class TelaCriarConta extends BaseActivity {
             Toast.makeText(this, R.string.pedidoEmail, Toast.LENGTH_SHORT).show();
         } else if (TextUtils.isEmpty(userSenha)) {
             Toast.makeText(this, R.string.pedidoSenha, Toast.LENGTH_SHORT).show();
+        }else if(userSenha.length() < 6){
+            Toast.makeText(this, R.string.avisoCaracteres, Toast.LENGTH_SHORT).show();
         } else {
             firabaseAuth.createUserWithEmailAndPassword(userEmail, userSenha).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override

@@ -1,7 +1,5 @@
 package com.example.ehComplicado.FirebaseHelper;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.firebase.database.ChildEventListener;

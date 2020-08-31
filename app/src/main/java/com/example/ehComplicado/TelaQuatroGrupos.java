@@ -1,26 +1,34 @@
 package com.example.ehComplicado;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ehComplicado.FirebaseHelper.TimeHelper;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,39 +52,36 @@ import model.bean.Time;
 import model.dao.JogadorDAO;
 import model.dao.TimeDAO;
 
-public class TelaQuatroGrupos extends AppCompatActivity {
-    DatabaseReference campReference;
-    List<Time> times;
-    ValueEventListener campListener, campListener2, campListener3, campListener4;
-    AccountHeader headerNavigation;
+public class TelaQuatroGrupos extends Fragment {
+    private DatabaseReference campReference;
+    private List<Time> times;
+    private ValueEventListener campListener,campListener2, campListener3, campListener4,campListener5,campListener6;
+
     private Campeonato camp;
-    JogadorDAO jogadorDAO;
-    Toolbar toolbar;
-    FirebaseUser user;
-    String campKey;
-    TimeHelper timeHelper;
 
+    private FirebaseUser user;
+    private String campKey;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tela_quatro_grupos);
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.ftc_fase_de_grupos);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_tela_quatro_grupos,container,false);
+    }
 
-        final TableLayout tbGrupo1 = findViewById(R.id.tabela_grupo_1);
-        final Spinner spinner = findViewById(R.id.spGrupo);
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        final TableLayout tbGrupo1 = view.findViewById(R.id.tabela_grupo_1);
+        final Spinner spinner = view.findViewById(R.id.spGrupo);
         spinner.getBackground().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
-        user = getIntent().getParcelableExtra("user");
-        campKey = getIntent().getStringExtra("campKey");
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        campKey = getArguments().getString("campKey");
         campReference = FirebaseDatabase.getInstance().getReference().child("campeonatos").child(campKey);
         DatabaseReference timesReference = FirebaseDatabase.getInstance().getReference().child("campeonato-times").child(campKey);
-        timeHelper = new TimeHelper(timesReference);
+        TimeHelper timeHelper = new TimeHelper(timesReference);
         times = timeHelper.retrive();
         final TimeDAO timeDAO = new TimeDAO();
-        jogadorDAO = new JogadorDAO();
         camp = new Campeonato();
         ValueEventListener mCampListener = new ValueEventListener() {
             @Override
@@ -87,13 +92,13 @@ public class TelaQuatroGrupos extends AppCompatActivity {
                     grupos.add(getString(R.string.grupoEspaco) + (i + 1));
                 }
                 final ArrayAdapter adapter =
-                        new ArrayAdapter<>(TelaQuatroGrupos.this, R.layout.personalizado_list_item, grupos);
+                        new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, grupos);
                 spinner.setAdapter(adapter);
-                if (!camp.isFinalizado()) {
+               /* if (!camp.isFinalizado()) {
                     createDrawer();
                 } else {
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                }
+                }*/
                 if (!camp.isIniciado() && !camp.isFinalizado()) {
                     List<Time> cabecasDeChave = timeDAO.listarCabecasDeChave(times);
                     for (Time time : cabecasDeChave) {
@@ -146,7 +151,47 @@ public class TelaQuatroGrupos extends AppCompatActivity {
         };
         campReference.addValueEventListener(mCampListener);
         campListener = mCampListener;
+        final Button btnJogos = view.findViewById(R.id.jogos_button);
+        btnJogos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ValueEventListener eventListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Campeonato camp = dataSnapshot.getValue(Campeonato.class);
+                        Intent it = new Intent(getContext(),TelaPrincipalJogos.class);
+                        it.putExtra("camp",camp);
+                        startActivity(it);
+                        getActivity().finish();
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                };
+                campReference.addListenerForSingleValueEvent(eventListener);
+                campListener6 = eventListener;
+
+            }
+        });
+        ValueEventListener eventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Campeonato campeonato = dataSnapshot.getValue(Campeonato.class);
+                if(user.getUid().equals(campeonato.getUid())){
+                    btnJogos.setVisibility(View.INVISIBLE);
+                    btnJogos.setClickable(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        campReference.addListenerForSingleValueEvent(eventListener);
+        campListener5 = eventListener;
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -228,9 +273,40 @@ public class TelaQuatroGrupos extends AppCompatActivity {
 
             }
         });
+        TextView tv = view.findViewById(R.id.lbl_depois);
+        tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ValueEventListener eventListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Campeonato camp = dataSnapshot.getValue(Campeonato.class);
+                        if(!camp.isFaseDeGrupos()){
+                            TelaOitavas t = new TelaOitavas();
+                            Bundle data = new Bundle();
+                            data.putString("campKey",campKey);
+                            t.setArguments(data);
+                            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                            transaction.replace(R.id.container, t);
+                            transaction.addToBackStack(null);
+                            transaction.commit();
+                        }else{
+                            Toast.makeText(getContext(), "Você ainda não pode avançar!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
+                    }
+                };
+                campReference.addListenerForSingleValueEvent(eventListener);
+                campListener2 = eventListener;
+            }
+        });
     }
+
+
 
     @Override
     public void onStop() {
@@ -247,27 +323,11 @@ public class TelaQuatroGrupos extends AppCompatActivity {
         if (campListener4 != null) {
             campReference.removeEventListener(campListener4);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        ValueEventListener mCampListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                camp = dataSnapshot.getValue(Campeonato.class);
-                if (!camp.isFaseDeGrupos()) {
-                    getMenuInflater().inflate(R.menu.ftc_menu_prox2, menu);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        campReference.addListenerForSingleValueEvent(mCampListener);
-        campListener2 = mCampListener;
-        return true;
+        if (campListener5 != null) {
+            campReference.removeEventListener(campListener5);
+        }if (campListener6 != null) {
+            campReference.removeEventListener(campListener6);
+        }
     }
 
     @Override
@@ -279,11 +339,12 @@ public class TelaQuatroGrupos extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         camp = dataSnapshot.getValue(Campeonato.class);
                         if (camp.isFinalizado()) {
-                            Intent it = new Intent(TelaQuatroGrupos.this, TelaPremios.class);
+                            Intent it = new Intent(getContext(), TelaPremios.class);
                             it.putExtra("user", user);
                             it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
+                            TelaCamps t = (TelaCamps)getActivity();
+                            t.startActivity(it);
+                            t.finish();
                         } else {
                             criarActivity();
                         }
@@ -303,17 +364,19 @@ public class TelaQuatroGrupos extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         camp = dataSnapshot.getValue(Campeonato.class);
                         if (camp.getNumTimes() == 16) {
-                            Intent it = new Intent(TelaQuatroGrupos.this, TelaOitavas.class);
+                            Intent it = new Intent(getContext(), TelaOitavas.class);
                             it.putExtra("user", user);
                             it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
+                            TelaCamps t = (TelaCamps)getActivity();
+                            t.startActivity(it);
+                            t.finish();
                         } else {
-                            Intent it = new Intent(TelaQuatroGrupos.this, TelaQuartas.class);
+                            Intent it = new Intent(getContext(), TelaQuartas.class);
                             it.putExtra("user", user);
                             it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
+                            TelaCamps t = (TelaCamps)getActivity();
+                            t.startActivity(it);
+                            t.finish();
                         }
                     }
 
@@ -329,109 +392,12 @@ public class TelaQuatroGrupos extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onBackPressed() {
-        ValueEventListener mCampListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                camp = dataSnapshot.getValue(Campeonato.class);
-                if (camp.isFinalizado()) {
-                    Intent it = new Intent(TelaQuatroGrupos.this, TelaPremios.class);
-                    it.putExtra("user", user);
-                    it.putExtra("campKey", campKey);
-                    startActivity(it);
-                    finish();
-                } else {
-                    criarActivity();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        campReference.addListenerForSingleValueEvent(mCampListener);
-        campListener3 = mCampListener;
-    }
-
     private void criarActivity() {
-        Intent it = new Intent(TelaQuatroGrupos.this, TelaCarregarCamp.class);
+        Intent it = new Intent(getContext(), TelaCarregarCamp.class);
         it.putExtra("user", user);
-        startActivity(it);
-        finish();
+        TelaCamps t = (TelaCamps)getActivity();
+        t.startActivity(it);
+        t.finish();
     }
 
-
-    private void createDrawer() {
-        //Itens do Drawer
-        headerNavigation = new AccountHeaderBuilder()
-                .withActivity(this)
-                .withProfileImagesVisible(false)
-                .withHeaderBackground(R.color.colorPrimaryDark)
-                .addProfiles(new ProfileDrawerItem().withName(user.getDisplayName()).withEmail(user.getEmail())
-                )
-                .build();
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.ftc_jogos).withIcon(R.drawable.soccer_ball_32px);
-        PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(R.string.ftc_artilheiros).withIcon(R.drawable.soccer_32px);
-        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName(R.string.ftc_suspensos).withIcon(R.drawable.soccer_card_32px);
-        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName(R.string.ftc_pendurados).withIcon(R.drawable.soccer_card_32px);
-        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName(R.string.ftc_voltar).withIcon(R.drawable.back_32px);
-        //Definição do Drawer
-        Drawer drawer = new DrawerBuilder()
-                .withActivity(this)
-                .withSliderBackgroundDrawableRes(R.drawable.gradient)
-                .withToolbar(toolbar)
-                .withAccountHeader(headerNavigation)
-                .addDrawerItems(
-                        item1,
-                        new DividerDrawerItem(),//Divisor
-                        item2,
-                        new DividerDrawerItem(),
-                        item3,
-                        new DividerDrawerItem(),
-                        item4,
-                        new DividerDrawerItem(),
-                        item5
-
-                )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (drawerItem.getIdentifier()==1) {
-                            Intent it = new Intent(TelaQuatroGrupos.this, TelaJogos.class);
-                            it.putExtra("user", user);
-                            it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
-                        } else if (drawerItem.getIdentifier()==2) {
-                            Intent it = new Intent(TelaQuatroGrupos.this, TelaArtilheiros.class);
-                            it.putExtra("user", user);
-                            it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
-                        } else if (drawerItem.getIdentifier()==3) {
-                            Intent it = new Intent(TelaQuatroGrupos.this, TelaSuspensos.class);
-                            it.putExtra("user", user);
-                            it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
-                        } else if (drawerItem.getIdentifier()==4) {
-                            Intent it = new Intent(TelaQuatroGrupos.this, TelaPendurados.class);
-                            it.putExtra("user", user);
-                            it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
-                        } else if (drawerItem.getIdentifier()==5) {
-                            criarActivity();
-                        }
-                        return false;
-                    }
-                })
-                .withSelectedItemByPosition(-1)
-                .build();
-        drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        drawer.getActionBarDrawerToggle().setHomeAsUpIndicator(R.drawable.menu_32px);
-    }
 }

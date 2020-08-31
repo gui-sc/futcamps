@@ -1,17 +1,18 @@
 package com.example.ehComplicado;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import android.content.Intent;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import com.example.ehComplicado.FirebaseHelper.JogadorHelper;
 import com.example.ehComplicado.FirebaseHelper.TimeHelper;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,33 +25,29 @@ import model.bean.Jogador;
 import model.bean.Time;
 import model.dao.JogadorDAO;
 
-public class TelaArtilheiros extends AppCompatActivity {
-    DatabaseReference jogadoresReference, campReference, timeReference;
-    TimeHelper timeHelper;
-    JogadorHelper jogadorHelper;
-    ValueEventListener campListener,campListener2,jogadorListener;
-    private Campeonato camp;
-    String campKey;
-    FirebaseUser user;
+public class TelaArtilheiros extends Fragment {
+    private DatabaseReference jogadoresReference;
+    private DatabaseReference campReference;
+    private ValueEventListener campListener, jogadorListener;
+private Campeonato camp;
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_tela_artilheiros,container,false);
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tela_artilheiros);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle(R.string.ftc_artilheiros);
-        final TableLayout tbArtilheiros = findViewById(R.id.tabela_artilheiros);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        final TableLayout tbArtilheiros = view.findViewById(R.id.tabela_artilheiros);
 
-        user = getIntent().getParcelableExtra("user");
-        campKey = getIntent().getStringExtra("campKey");
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String campKey = getArguments().getString("campKey");
         campReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonatos").child(campKey);
         jogadoresReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonato-jogadores").child(campKey);
-        timeReference = FirebaseDatabase.getInstance().getReference()
+        DatabaseReference timeReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonato-times").child(campKey);
         camp = new Campeonato();
 
@@ -67,15 +64,15 @@ public class TelaArtilheiros extends AppCompatActivity {
         };
         campReference.addValueEventListener(mCampListener);
         campListener = mCampListener;
-        jogadorHelper = new JogadorHelper(jogadoresReference);
-        timeHelper = new TimeHelper(timeReference);
+        JogadorHelper jogadorHelper = new JogadorHelper(jogadoresReference);
+        TimeHelper timeHelper = new TimeHelper(timeReference);
         final List<Time> times = timeHelper.retrive();
         final List<Jogador> jogadors = jogadorHelper.retrive();
         final JogadorDAO jogadorDAO = new JogadorDAO();
         ValueEventListener mJogadorListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<Jogador> artilheiros = jogadorDAO.listarArtilheiros(jogadors,times);
+                List<Jogador> artilheiros = jogadorDAO.listarArtilheiros(jogadors, times);
                 for (Jogador jogador : artilheiros) {
                     View tr = getLayoutInflater().inflate(R.layout.tabela_artilheiros_linha, null, false);
                     TextView txtNome = tr.findViewById(R.id.nome_jogador);
@@ -95,72 +92,58 @@ public class TelaArtilheiros extends AppCompatActivity {
         };
         jogadoresReference.addListenerForSingleValueEvent(mJogadorListener);
         jogadorListener = mJogadorListener;
-
     }
+
     @Override
-    public void onStop(){
+    public void onStop() {
         super.onStop();
-        if (campListener != null){
+        if (campListener != null) {
             campReference.removeEventListener(campListener);
         }
-        if (campListener2 != null){
-            campReference.removeEventListener(campListener2);
-        }
-        if (jogadorListener != null){
+        if (jogadorListener != null) {
             jogadoresReference.removeEventListener(jogadorListener);
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            criarActivity();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    @Override
-    public void onBackPressed(){
-        criarActivity();
-    }
-    private void criarActivity(){
+   /* private void criarActivity() {
         ValueEventListener mCampListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 camp = dataSnapshot.getValue(Campeonato.class);
                 if (camp.isFaseDeGrupos()) {
                     Intent it = new Intent(TelaArtilheiros.this, TelaQuatroGrupos.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",campKey);
+                    it.putExtra("user", user);
+                    it.putExtra("campKey", campKey);
                     startActivity(it);
                     finish();
                 } else if (camp.isOitavas()) {
                     Intent it = new Intent(TelaArtilheiros.this, TelaOitavas.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",campKey);
+                    it.putExtra("user", user);
+                    it.putExtra("campKey", campKey);
                     startActivity(it);
                     finish();
                 } else if (camp.isQuartas()) {
                     Intent it = new Intent(TelaArtilheiros.this, TelaQuartas.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",campKey);
+                    it.putExtra("user", user);
+                    it.putExtra("campKey", campKey);
                     startActivity(it);
                     finish();
                 } else if (camp.isSemi()) {
                     Intent it = new Intent(TelaArtilheiros.this, TelaSemi.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",campKey);
+                    it.putExtra("user", user);
+                    it.putExtra("campKey", campKey);
                     startActivity(it);
                     finish();
                 } else if (camp.isFinal()) {
                     Intent it = new Intent(TelaArtilheiros.this, TelaFinal.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",campKey);
+                    it.putExtra("user", user);
+                    it.putExtra("campKey", campKey);
                     startActivity(it);
                     finish();
-                }else if(camp.isFinalizado()){
+                } else if (camp.isFinalizado()) {
                     Intent it = new Intent(TelaArtilheiros.this, TelaPremios.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",campKey);
+                    it.putExtra("user", user);
+                    it.putExtra("campKey", campKey);
                     startActivity(it);
                     finish();
                 }
@@ -173,6 +156,6 @@ public class TelaArtilheiros extends AppCompatActivity {
         };
         campReference.addValueEventListener(mCampListener);
         campListener2 = mCampListener;
-    }
+    }*/
 
 }

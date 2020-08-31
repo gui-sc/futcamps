@@ -1,11 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimaryDark">@color/md_green_800</item>
         <item name="android:windowBackground">@color/colorPrimary</item>
-
-
     </style>
 
     <style name="MeuTheme" parent="Theme.AppCompat.NoActionBar">
@@ -34,14 +33,17 @@
     <style name="Widget.Futcamps.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
+    <style name="Widget.Futcamps.Button.DeleteButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="backgroundTint">@android:color/holo_red_light</item>
+    </style>
     <style name="TextAppearance.Futcamps.TextInputLayout.HintText" parent="TextAppearance.MaterialComponents.Subtitle2">
         <item name="android:textColor">@android:color/white</item>
     </style>
     <style name="Widget.Futcamps.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-    <item name="hintTextAppearance">@style/TextAppearance.Futcamps.TextInputLayout.HintText</item>
-    <item name="android:textColorHint">@color/toolbarIconColor</item>
-    <item name="android:paddingBottom">8dp</item>
-    <item name="boxStrokeColor">@color/textInputOutlineColor</item>
+        <item name="hintTextAppearance">@style/TextAppearance.Futcamps.TextInputLayout.HintText</item>
+        <item name="android:textColorHint">@color/toolbarIconColor</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="boxStrokeColor">@color/textInputOutlineColor</item>
     </style>
 </resources>

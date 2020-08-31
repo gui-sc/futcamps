@@ -2,6 +2,7 @@ package com.example.ehComplicado;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,13 +18,13 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class MainActivity extends BaseActivity{
+public class MainActivity extends BaseActivity {
     private FirebaseAuth mFirebaseAuth;
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
     private Button btnEntrar, btnNovaConta;
     private TextView esqueceuSenha;
-    private EditText email,senha;
+    private EditText email, senha;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -49,7 +50,7 @@ public class MainActivity extends BaseActivity{
         btnNovaConta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent it = new Intent(MainActivity.this,TelaCriarConta.class);
+                Intent it = new Intent(MainActivity.this, TelaCriarConta.class);
                 startActivity(it);
                 finish();
             }
@@ -57,39 +58,45 @@ public class MainActivity extends BaseActivity{
         esqueceuSenha.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,TelaRecuperarSenha.class));
+                startActivity(new Intent(MainActivity.this, TelaRecuperarSenha.class));
                 finish();
             }
         });
 
     }
-    private void initComponents(){
+
+    private void initComponents() {
         btnEntrar = findViewById(R.id.entrar);
         btnNovaConta = findViewById(R.id.novaConta);
         esqueceuSenha = findViewById(R.id.senhaEsquecida);
         email = findViewById(R.id.email);
         senha = findViewById(R.id.password);
     }
-    private void entrar(){
+
+    private void entrar() {
         showProgressBar();
         String userEmail = email.getText().toString();
         String userSenha = senha.getText().toString();
-        mFirebaseAuth.signInWithEmailAndPassword(userEmail,userSenha)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()){
-                            FirebaseUser user = mFirebaseAuth.getCurrentUser();
-                            Intent it = new Intent(MainActivity.this,TelaCarregarCamp.class);
-                            it.putExtra("user",user);
-                            startActivity(it);
-                            hideProgressBar();
-                            finish();
-                        }else{
-                            hideProgressBar();
-                            Toast.makeText(MainActivity.this, "Ocorreu um erro...", Toast.LENGTH_SHORT).show();
+        if (userSenha.length() < 6) {
+            Toast.makeText(this, "A senha deve conter no mínimo 6 digitos", Toast.LENGTH_SHORT).show();
+        } else {
+            mFirebaseAuth.signInWithEmailAndPassword(userEmail, userSenha)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                FirebaseUser user = mFirebaseAuth.getCurrentUser();
+                                Intent it = new Intent(MainActivity.this, TelaCarregarCamp.class);
+                                it.putExtra("user", user);
+                                startActivity(it);
+                                hideProgressBar();
+                                finish();
+                            } else {
+                                hideProgressBar();
+                                Toast.makeText(MainActivity.this, "Ocorreu um erro...", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                });
+                    });
+        }
     }
 }

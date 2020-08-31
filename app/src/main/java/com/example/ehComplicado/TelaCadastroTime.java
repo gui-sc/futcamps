@@ -1,16 +1,22 @@
 package com.example.ehComplicado;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -19,6 +25,7 @@ import com.example.ehComplicado.FirebaseHelper.TimeHelper;
 import com.example.ehComplicado.FirebaseHelper.UsuarioHelper;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,9 +44,9 @@ import model.dao.CampeonatoDAO;
 import model.dao.PartidaDAO;
 import model.dao.TimeDAO;
 
-public class TelaCadastroTime extends AppCompatActivity {
+public class TelaCadastroTime extends Fragment {
     private DatabaseReference campReference;
-    TimeHelper timeHelper;
+    private TimeHelper timeHelper;
     private String campKey;
     private TimeDAO timeDAO;
     private Campeonato camp;
@@ -55,25 +62,24 @@ public class TelaCadastroTime extends AppCompatActivity {
     private Switch swCabecaDeChave;
     private PartidaDAO partidaDAO;
     private ValueEventListener campListener, campListener2, campListener3;
-    FirebaseUser user;
-    TimeHelper helper;
-    List<Usuario> usuarios;
-    UsuarioHelper usuarioHelper;
+    private FirebaseUser user;
+    private TimeHelper helper;
+    private List<Usuario> usuarios;
+   private UsuarioHelper usuarioHelper;
 
-    List<Time> times;
+    private List<Time> times;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tela_cadastro_time);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle(R.string.ftc_cadastro_time);
-        user = getIntent().getParcelableExtra("user");
-        campKey = getIntent().getStringExtra("campKey");
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_cadastro_time,container,false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        campKey = getArguments().getString("campKey");
         partidaDAO = new PartidaDAO();
         campReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonatos").child(campKey);
@@ -86,13 +92,13 @@ public class TelaCadastroTime extends AppCompatActivity {
         timeDAO = new TimeDAO();
         timeHelper = new TimeHelper(timesReference);
         times = timeHelper.retrive();
-        nomeTextInput = findViewById(R.id.nome_text_input);
-        nomeEditText = findViewById(R.id.nome_edit_text);
-        dirigenteTextInput = findViewById(R.id.dirigente_text_input);
-        dirigenteEditText = findViewById(R.id.dirigente_edit_text);
-        cidadeTextInput = findViewById(R.id.cidade_text_input);
-        cidadeEditText = findViewById(R.id.cidade_edit_text);
-        swCabecaDeChave = findViewById(R.id.sw_cabecaDeChave);
+        nomeTextInput = view.findViewById(R.id.nome_text_input);
+        nomeEditText = view.findViewById(R.id.nome_edit_text);
+        dirigenteTextInput = view.findViewById(R.id.dirigente_text_input);
+        dirigenteEditText = view.findViewById(R.id.dirigente_edit_text);
+        cidadeTextInput = view.findViewById(R.id.cidade_text_input);
+        cidadeEditText = view.findViewById(R.id.cidade_edit_text);
+        swCabecaDeChave = view.findViewById(R.id.sw_cabecaDeChave);
         helper = new TimeHelper(timesReference);
         times = helper.retrive();
         ValueEventListener a = new ValueEventListener() {
@@ -122,7 +128,7 @@ public class TelaCadastroTime extends AppCompatActivity {
                         camp = dataSnapshot.getValue(Campeonato.class);
                         if (isChecked) {
                             if (camp.getCabecasDeChave() == camp.getNumGrupos()) {
-                                Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_cabeca, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), R.string.ftc_aviso_cabeca, Toast.LENGTH_SHORT).show();
                                 swCabecaDeChave.setChecked(false);
                                 cabecaDeChave = false;
                             } else {
@@ -137,9 +143,103 @@ public class TelaCadastroTime extends AppCompatActivity {
                 };
                 campReference.addListenerForSingleValueEvent(mCampListener);
                 campListener3 = mCampListener;
+
             }
         });
+        Button btnSalvar = view.findViewById(R.id.salvar_button);
+        btnSalvar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                nome = nomeEditText.getText().toString();
+                dirigente = dirigenteEditText.getText().toString();
+                cidade = cidadeEditText.getText().toString();
+                if (valida(nome)) {
+                    nomeTextInput.setError(getString(R.string.ftc_aviso_vazio));
+                } else if (valida(dirigente)) {
+                    dirigenteTextInput.setError(getString(R.string.ftc_aviso_vazio));
+                } else if (valida(cidade)) {
+                    cidadeTextInput.setError(getString(R.string.ftc_aviso_vazio));
+                } else {
 
+                    if (cabecaDeChave) {
+                        campDAO.cabecaDeChaveMais(camp, usuarios);
+                        cadastro();
+                    } else {
+                        if (camp.getNumGrupos() == 4) {
+                            if (camp.getNumTimes() == 16) {
+                                if (camp.getCabecasDeChave() == 0 && times.size() == 12) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else if (camp.getCabecasDeChave() == 1 && times.size() == 13) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else if (camp.getCabecasDeChave() == 2 && times.size() == 14) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else if (camp.getCabecasDeChave() == 13 && times.size() == 15) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    cadastro();
+                                }
+                            } else if (camp.getNumTimes() == 12) {
+                                if (camp.getCabecasDeChave() == 0 && times.size() == 8) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else if (camp.getCabecasDeChave() == 1 && times.size() == 9) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else if (camp.getCabecasDeChave() == 2 && times.size() == 10) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else if (camp.getCabecasDeChave() == 3 && times.size() == 11) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    cadastro();
+                                }
+                            }
+                        } else if (camp.getNumGrupos() == 2) {
+                            if (camp.getNumTimes() == 6) {
+                                if (camp.getCabecasDeChave() == 0 && times.size() == 4) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else if (camp.getCabecasDeChave() == 1 && times.size() == 5) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    cadastro();
+                                }
+                            } else if (camp.getNumTimes() == 8) {
+                                if (camp.getCabecasDeChave() == 0 && times.size() == 6) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else if (camp.getCabecasDeChave() == 1 && times.size() == 7) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    cadastro();
+                                }
+                            } else if (camp.getNumTimes() == 10) {
+                                if (camp.getCabecasDeChave() == 0 && times.size() == 8) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else if (camp.getCabecasDeChave() == 1 && times.size() == 9) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    cadastro();
+                                }
+                            } else if (camp.getNumTimes() == 12) {
+                                if (camp.getCabecasDeChave() == 0 && times.size() == 10) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else if (camp.getCabecasDeChave() == 1 && times.size() == 11) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    cadastro();
+                                }
+                            } else if (camp.getNumTimes() == 16) {
+                                if (camp.getCabecasDeChave() == 0 && times.size() == 14) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else if (camp.getCabecasDeChave() == 1 && times.size() == 15) {
+                                    Toast.makeText(getContext(), R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    cadastro();
+                                }
+                            }
+                        } else {
+                            cadastro();
+                        }
+                    }
+                }
+            }
+        });
 
     }
 
@@ -157,144 +257,12 @@ public class TelaCadastroTime extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.ftc_menu_salvar, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        ValueEventListener mCampListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                camp = dataSnapshot.getValue(Campeonato.class);
-                campDAO = new CampeonatoDAO();
-                switch (item.getItemId()) {
-                    case android.R.id.home:
-                        criarActivity();
-                        break;
-                    case R.id.btn_salvar:
-                        nome = nomeEditText.getText().toString();
-                        dirigente = dirigenteEditText.getText().toString();
-                        cidade = cidadeEditText.getText().toString();
-                        if (valida(nome)) {
-                            nomeTextInput.setError(getString(R.string.ftc_aviso_vazio));
-                        } else if (valida(dirigente)) {
-                            dirigenteTextInput.setError(getString(R.string.ftc_aviso_vazio));
-                        } else if (valida(cidade)) {
-                            cidadeTextInput.setError(getString(R.string.ftc_aviso_vazio));
-                        } else {
-
-                            if (cabecaDeChave) {
-                                campDAO.cabecaDeChaveMais(camp, usuarios);
-                                cadastro();
-                            } else {
-                                if (camp.getNumGrupos() == 4) {
-                                    if (camp.getNumTimes() == 16) {
-                                        if (camp.getCabecasDeChave() == 0 && times.size() == 12) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else if (camp.getCabecasDeChave() == 1 && times.size() == 13) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else if (camp.getCabecasDeChave() == 2 && times.size() == 14) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else if (camp.getCabecasDeChave() == 13 && times.size() == 15) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            cadastro();
-                                        }
-                                    } else if (camp.getNumTimes() == 12) {
-                                        if (camp.getCabecasDeChave() == 0 && times.size() == 8) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else if (camp.getCabecasDeChave() == 1 && times.size() == 9) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else if (camp.getCabecasDeChave() == 2 && times.size() == 10) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else if (camp.getCabecasDeChave() == 3 && times.size() == 11) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            cadastro();
-                                        }
-                                    }
-                                } else if (camp.getNumGrupos() == 2) {
-                                    if (camp.getNumTimes() == 6) {
-                                        if (camp.getCabecasDeChave() == 0 && times.size() == 4) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else if (camp.getCabecasDeChave() == 1 && times.size() == 5) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            cadastro();
-                                        }
-                                    } else if (camp.getNumTimes() == 8) {
-                                        if (camp.getCabecasDeChave() == 0 && times.size() == 6) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else if (camp.getCabecasDeChave() == 1 && times.size() == 7) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            cadastro();
-                                        }
-                                    } else if (camp.getNumTimes() == 10) {
-                                        if (camp.getCabecasDeChave() == 0 && times.size() == 8) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else if (camp.getCabecasDeChave() == 1 && times.size() == 9) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            cadastro();
-                                        }
-                                    } else if (camp.getNumTimes() == 12) {
-                                        if (camp.getCabecasDeChave() == 0 && times.size() == 10) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else if (camp.getCabecasDeChave() == 1 && times.size() == 11) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            cadastro();
-                                        }
-                                    } else if (camp.getNumTimes() == 16) {
-                                        if (camp.getCabecasDeChave() == 0 && times.size() == 14) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else if (camp.getCabecasDeChave() == 1 && times.size() == 15) {
-                                            Toast.makeText(TelaCadastroTime.this, R.string.ftc_aviso_time_cabeca, Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            cadastro();
-                                        }
-                                    }
-                                } else {
-                                    cadastro();
-                                }
-                            }
-                        }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        campReference.addListenerForSingleValueEvent(mCampListener);
-        campListener2 = mCampListener;
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        criarActivity();
-    }
-
-    private void criarActivity() {
-        Intent it = new Intent(TelaCadastroTime.this, TelaEditarCamp.class);
-        it.putExtra("user", user);
-        it.putExtra("campKey", campKey);
-        startActivity(it);
-        finish();
-    }
-
     private boolean valida(String s) {
         return s.equals("");
     }
 
     private void cadastro() {
-        Toast.makeText(this, R.string.ftc_cadastrando, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.ftc_cadastrando, Toast.LENGTH_SHORT).show();
         Time time = new Time();
         time.setNome(nome);
         time.setDirigente(dirigente);
@@ -1001,13 +969,18 @@ public class TelaCadastroTime extends AppCompatActivity {
                 campDAO.passarDeFase(camp, usuarios);
             }
         }
-        Toast.makeText(this, R.string.ftc_sucesso, Toast.LENGTH_SHORT).show();
-        Intent it = new Intent(TelaCadastroTime.this, TelaCadastroJogador.class);
-        it.putExtra("timeKey", key);
-        it.putExtra("user", user);
-        it.putExtra("campKey", campKey);
-        startActivity(it);
-        finish();
+        Toast.makeText(getContext(), R.string.ftc_sucesso, Toast.LENGTH_SHORT).show();
+        TelaCadastroJogador t = new TelaCadastroJogador();
+        Bundle b = new Bundle();
+        b.putString("timeKey",key);
+        b.putString("campKey",campKey);
+        t.setArguments(b);
+        openFragment(t);
     }
-
+    public void openFragment(Fragment fragment){
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
 }

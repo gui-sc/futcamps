@@ -1,36 +1,34 @@
 package com.example.ehComplicado;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.ehComplicado.FirebaseHelper.JogadorHelper;
 import com.example.ehComplicado.FirebaseHelper.PartidaHelper;
 import com.example.ehComplicado.FirebaseHelper.TimeHelper;
 import com.example.ehComplicado.FirebaseHelper.UsuarioHelper;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import model.bean.Campeonato;
 import model.bean.Jogador;
 import model.bean.Partida;
@@ -41,45 +39,45 @@ import model.dao.JogadorDAO;
 import model.dao.PartidaDAO;
 import model.dao.TimeDAO;
 
-public class TelaJogos extends AppCompatActivity {
-    DatabaseReference timeReference, partidaReference, campReference;
-    FirebaseUser user;
-    List<Partida> partidas1;
+public class TelaJogos extends Fragment {
+    private DatabaseReference campReference;
+    private FirebaseUser user;
+    private List<Partida> partidas1;
     private String campKey;
-    CampeonatoDAO campDAO;
-    PartidaHelper partidaHelper;
-    TimeHelper timeHelper;
+    private CampeonatoDAO campDAO;
     private TimeDAO timeDAO;
-    List<Usuario> usuarios;
-    UsuarioHelper usuarioHelper;
+    private List<Usuario> usuarios;
     private Partida partida;
-    boolean todasCadastradas;
+    private boolean todasCadastradas;
     private Campeonato camp;
-    private ValueEventListener campListener, campListener2, campListener3, campListener4, campListener5;
-    ArrayAdapter<Partida> adapter;
-    List<Partida> partidasGrupos, oitavas, quartas, semi, Final;
+    private ValueEventListener campListener,campListener2, campListener3, campListener4, campListener5;
+    private ArrayAdapter<Partida> adapter;
+    Button btnChave;
+    private List<Partida> partidasGrupos, oitavas, quartas, semi, Final;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_tela_jogos, container, false);
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tela_jogos);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle(R.string.ftc_jogos);
-        final ListView lstJogos = findViewById(R.id.ftc_lista_jogos);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        final ListView lstJogos = view.findViewById(R.id.ftc_lista_jogos);
 
         timeDAO = new TimeDAO();
         campDAO = new CampeonatoDAO();
         final PartidaDAO partidaDAO = new PartidaDAO();
 
-        user = getIntent().getParcelableExtra("user");
-        campKey = getIntent().getStringExtra("campKey");
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
+        campKey = getArguments().getString("campKey");
+
         campReference = FirebaseDatabase.getInstance().getReference().child("campeonatos").child(campKey);
-        timeReference = FirebaseDatabase.getInstance().getReference()
+        DatabaseReference timeReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonato-times").child(campKey);
-        partidaReference = FirebaseDatabase.getInstance().getReference()
+        DatabaseReference partidaReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonato-partidas").child(campKey);
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference()
                 .child("campeonato-seguidores").child(campKey);
@@ -90,18 +88,50 @@ public class TelaJogos extends AppCompatActivity {
         quartas = new ArrayList<>();
         semi = new ArrayList<>();
         Final = new ArrayList<>();
-        usuarioHelper = new UsuarioHelper(userRef);
+        UsuarioHelper usuarioHelper = new UsuarioHelper(userRef);
         usuarios = usuarioHelper.retrive();
-        timeHelper = new TimeHelper(timeReference);
-        partidaHelper = new PartidaHelper(partidaReference);
+        TimeHelper timeHelper = new TimeHelper(timeReference);
+        PartidaHelper partidaHelper = new PartidaHelper(partidaReference);
         final List<Time> times = timeHelper.retrive();
         camp = new Campeonato();
         partidas1 = partidaHelper.retrive();
         final List<Jogador> jogadores = jogadorHelper.retrive();
         final JogadorDAO jogadorDAO = new JogadorDAO();
-        final TextView lblAntes = findViewById(R.id.lbl_antes);
-        final TextView lblDepois = findViewById(R.id.lbl_depois);
-        final TextView lblAtual = findViewById(R.id.lbl_atual);
+        final TextView lblAntes = view.findViewById(R.id.lbl_antes);
+        final TextView lblDepois = view.findViewById(R.id.lbl_depois);
+        final TextView lblAtual = view.findViewById(R.id.lbl_atual);
+        btnChave = view.findViewById(R.id.chaveamento_button);
+        btnChave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TelaOitavas t = new TelaOitavas();
+                Bundle data = new Bundle();
+                data.putString("campKey",campKey);
+                t.setArguments(data);
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.container, t);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Campeonato campeonato = dataSnapshot.getValue(Campeonato.class);
+                if(user.getUid().equals(campeonato.getUid())){
+                    btnChave.setClickable(false);
+                    btnChave.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        campReference.addListenerForSingleValueEvent(listener);
+        campListener2 = listener;
+
         lblAntes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,7 +143,7 @@ public class TelaJogos extends AppCompatActivity {
                             if (camp.getNumGrupos() > 0) {
                                 lblAtual.setText(R.string.faseDeGrupos);
                                 partidasGrupos = partidaDAO.listarFase(partidas1, "grupos");
-                                adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, partidasGrupos);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, partidasGrupos);
                                 lstJogos.setAdapter(adapter);
                             }
                         } else if (lblAtual.getText().equals(getString(R.string.Quartas))) {
@@ -121,12 +151,12 @@ public class TelaJogos extends AppCompatActivity {
                                     (camp.getNumGrupos() == 2 && (camp.getClassificados() == 3 || camp.getClassificados() == 4))) {
                                 lblAtual.setText(getString(R.string.faseDeGrupos));
                                 partidasGrupos = partidaDAO.listarFase(partidas1, "grupos");
-                                adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, partidasGrupos);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, partidasGrupos);
                             } else {
                                 if (camp.getNumGrupos() == 0 && camp.getNumTimes() > 8) {
                                     lblAtual.setText(getString(R.string.oitavas));
                                     oitavas = partidaDAO.listarFase(partidas1, "oitavas");
-                                    adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, oitavas);
+                                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, oitavas);
                                     lstJogos.setAdapter(adapter);
                                 }
                             }
@@ -135,40 +165,40 @@ public class TelaJogos extends AppCompatActivity {
                                 if (camp.getClassificados() == 2) {
                                     lblAtual.setText(getString(R.string.faseDeGrupos));
                                     partidasGrupos = partidaDAO.listarFase(partidas1, "grupos");
-                                    adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, partidasGrupos);
+                                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, partidasGrupos);
 
                                 } else {
                                     lblAtual.setText(getString(R.string.Quartas));
                                     quartas = partidaDAO.listarFase(partidas1, "quartas");
-                                    adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, quartas);
+                                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
                                     lstJogos.setAdapter(adapter);
                                 }
                             } else if (camp.getNumGrupos() == 4) {
                                 if (camp.getClassificados() == 1) {
                                     lblAtual.setText(R.string.faseDeGrupos);
-                                    adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, partidasGrupos);
+                                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, partidasGrupos);
                                 } else {
                                     lblAtual.setText(getString(R.string.Quartas));
                                     quartas = partidaDAO.listarFase(partidas1, "quartas");
-                                    adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, quartas);
+                                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
                                     lstJogos.setAdapter(adapter);
                                 }
                             } else {
                                 lblAtual.setText(getString(R.string.Quartas));
                                 quartas = partidaDAO.listarFase(partidas1, "quartas");
-                                adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, quartas);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
                                 lstJogos.setAdapter(adapter);
                             }
                         } else if (lblAtual.getText().equals(getString(R.string.Final))) {
                             if (camp.getNumGrupos() == 2 && camp.getClassificados() == 1) {
                                 lblAtual.setText(getString(R.string.faseDeGrupos));
                                 partidasGrupos = partidaDAO.listarFase(partidas1, "grupos");
-                                adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, partidasGrupos);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, partidasGrupos);
 
                             } else {
                                 lblAtual.setText(getString(R.string.Semi));
                                 semi = partidaDAO.listarFase(partidas1, "semi");
-                                adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, semi);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, semi);
                                 lstJogos.setAdapter(adapter);
                                 lblDepois.setVisibility(View.VISIBLE);
                             }
@@ -197,17 +227,17 @@ public class TelaJogos extends AppCompatActivity {
                                     if (camp.getClassificados() == 3 || camp.getClassificados() == 4) {
                                         lblAtual.setText(getString(R.string.oitavas));
                                         oitavas = partidaDAO.listarFase(partidas1, "oitavas");
-                                        adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, oitavas);
+                                        adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, oitavas);
                                         lstJogos.setAdapter(adapter);
                                     } else if (camp.getClassificados() == 2) {
                                         lblAtual.setText(getString(R.string.Quartas));
                                         quartas = partidaDAO.listarFase(partidas1, "quartas");
-                                        adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, quartas);
+                                        adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
                                         lstJogos.setAdapter(adapter);
                                     } else {
                                         lblAtual.setText(R.string.Semi);
                                         semi = partidaDAO.listarFase(partidas1, "semi");
-                                        adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, semi);
+                                        adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, semi);
                                         lstJogos.setAdapter(adapter);
                                     }
                                 }
@@ -217,17 +247,17 @@ public class TelaJogos extends AppCompatActivity {
                                     if (camp.getClassificados() == 3 || camp.getClassificados() == 4) {
                                         lblAtual.setText(R.string.Quartas);
                                         quartas = partidaDAO.listarFase(partidas1, "quartas");
-                                        adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, quartas);
+                                        adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
                                         lstJogos.setAdapter(adapter);
                                     } else if (camp.getClassificados() == 2) {
                                         lblAtual.setText(getString(R.string.Semi));
                                         semi = partidaDAO.listarFase(partidas1, "semi");
-                                        adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, semi);
+                                        adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, semi);
                                         lstJogos.setAdapter(adapter);
                                     } else {
                                         lblAtual.setText(R.string.ftc_final);
                                         Final = partidaDAO.listarFase(partidas1, "final");
-                                        adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, Final);
+                                        adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, Final);
                                         lstJogos.setAdapter(adapter);
                                     }
                                 }
@@ -237,21 +267,21 @@ public class TelaJogos extends AppCompatActivity {
                             if (!camp.isOitavas()) {
                                 lblAtual.setText(getString(R.string.Quartas));
                                 quartas = partidaDAO.listarFase(partidas1, "quartas");
-                                adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, quartas);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
                                 lstJogos.setAdapter(adapter);
                             }
                         } else if (lblAtual.getText().equals(getString(R.string.Quartas))) {
                             if (!camp.isQuartas()) {
                                 lblAtual.setText(getString(R.string.Semi));
                                 semi = partidaDAO.listarFase(partidas1, "semi");
-                                adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, semi);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, semi);
                                 lstJogos.setAdapter(adapter);
                             }
                         } else if (lblAtual.getText().equals(getString(R.string.Semi))) {
                             if (!camp.isSemi()) {
                                 lblAtual.setText(getString(R.string.Final));
                                 Final = partidaDAO.listarFase(partidas1, "final");
-                                adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, Final);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, Final);
                                 lstJogos.setAdapter(adapter);
                                 lblDepois.setVisibility(View.INVISIBLE);
                             }
@@ -276,27 +306,27 @@ public class TelaJogos extends AppCompatActivity {
                 if (camp.isFaseDeGrupos()) {
                     lblAtual.setText(R.string.faseDeGrupos);
                     partidasGrupos = partidaDAO.listarFase(partidas1, "grupos");
-                    adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, partidasGrupos);
+                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, partidasGrupos);
                     lstJogos.setAdapter(adapter);
                 } else if (camp.isOitavas()) {
                     lblAtual.setText(getString(R.string.oitavas));
                     oitavas = partidaDAO.listarFase(partidas1, "oitavas");
-                    adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, oitavas);
+                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, oitavas);
                     lstJogos.setAdapter(adapter);
                 } else if (camp.isQuartas()) {
                     lblAtual.setText(getString(R.string.Quartas));
                     quartas = partidaDAO.listarFase(partidas1, "quartas");
-                    adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, quartas);
+                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
                     lstJogos.setAdapter(adapter);
                 } else if (camp.isSemi()) {
                     lblAtual.setText(getString(R.string.Semi));
                     semi = partidaDAO.listarFase(partidas1, "semi");
-                    adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, semi);
+                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, semi);
                     lstJogos.setAdapter(adapter);
                 } else {
                     lblAtual.setText(getString(R.string.Final));
                     Final = partidaDAO.listarFase(partidas1, "final");
-                    adapter = new ArrayAdapter<>(TelaJogos.this, R.layout.personalizado_list_item, Final);
+                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, Final);
                     lstJogos.setAdapter(adapter);
                     lblDepois.setVisibility(View.INVISIBLE);
                 }
@@ -1232,12 +1262,13 @@ public class TelaJogos extends AppCompatActivity {
                         camp.setFinalizado(true);
                     }
                     campDAO.passarDeFase(camp, usuarios);
-                    Intent it = new Intent(TelaJogos.this, Tela.class);
+                    Intent it = new Intent(getContext(), Tela.class);
                     it.putExtra("user", user);
-                    it.putExtra("campKey", campKey);
+                    it.putExtra("camp", camp);
                     it.putExtra("key", "jogos");
-                    startActivity(it);
-                    finish();
+                    TelaPrincipalJogos t = (TelaPrincipalJogos)getActivity();
+                    t.startActivity(it);
+                    t.finish();
                 }
 
             }
@@ -1247,7 +1278,7 @@ public class TelaJogos extends AppCompatActivity {
 
             }
         };
-        campReference.addValueEventListener(mCampListener);
+        campReference.addListenerForSingleValueEvent(mCampListener);
         campListener = mCampListener;
         partida = new Partida();
         lstJogos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -1270,24 +1301,24 @@ public class TelaJogos extends AppCompatActivity {
                             partida = Final.get(position);
                         }
                         if (partida.isCadastrada()) {
-                            Intent it = new Intent(TelaJogos.this, TelaSumula.class);
-                            it.putExtra("partidaKey", partida.getId());
-                            it.putExtra("partida", partida);
-                            it.putExtra("user", user);
-                            it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
+                            TelaSumula t = new TelaSumula();
+                            Bundle data = new Bundle();
+                            data.putString("campKey",campKey);
+                            data.putString("partidaKey",partida.getId());
+                            data.putParcelable("partida",partida);
+                            t.setArguments(data);
+                            openFragment(t);
                         } else {
                             if (camp.getUid().equals(user.getUid())) {
-                                Intent it = new Intent(TelaJogos.this, TelaNovaPartida.class);
-                                it.putExtra("partidaKey", partida.getId());
-                                it.putExtra("partida", partida);
-                                it.putExtra("user", user);
-                                it.putExtra("campKey", campKey);
-                                startActivity(it);
-                                finish();
+                                TelaNovaPartida t = new TelaNovaPartida();
+                                Bundle data = new Bundle();
+                                data.putString("campKey",campKey);
+                                data.putString("partidaKey",partida.getId());
+                                data.putParcelable("partida",partida);
+                                t.setArguments(data);
+                                openFragment(t);
                             } else {
-                                Toast.makeText(TelaJogos.this, R.string.partidaNaoCadastrada, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), R.string.partidaNaoCadastrada, Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -1302,6 +1333,13 @@ public class TelaJogos extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void openFragment(Fragment fragment){
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
@@ -1322,87 +1360,6 @@ public class TelaJogos extends AppCompatActivity {
         if (campListener5 != null) {
             campReference.removeEventListener(campListener5);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.ftc_menu_atualizar,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                criarActivity();
-                break;
-            case R.id.btn_atualizar:
-                Intent it = new Intent(TelaJogos.this,Tela.class);
-                it.putExtra("user",user);
-                it.putExtra("campKey",campKey);
-                it.putExtra("key","jogos");
-                startActivity(it);
-                finish();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        criarActivity();
-    }
-
-    private void criarActivity() {
-        ValueEventListener mCampListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                camp = dataSnapshot.getValue(Campeonato.class);
-                if (camp.isFaseDeGrupos()) {
-                    Intent it = new Intent(TelaJogos.this, TelaQuatroGrupos.class);
-                    it.putExtra("user", user);
-                    it.putExtra("campKey", campKey);
-                    startActivity(it);
-                    finish();
-                } else if (camp.isOitavas()) {
-                    Intent it = new Intent(TelaJogos.this, TelaOitavas.class);
-                    it.putExtra("user", user);
-                    it.putExtra("campKey", campKey);
-                    startActivity(it);
-                    finish();
-                } else if (camp.isQuartas()) {
-                    Intent it = new Intent(TelaJogos.this, TelaQuartas.class);
-                    it.putExtra("user", user);
-                    it.putExtra("campKey", campKey);
-                    startActivity(it);
-                    finish();
-                } else if (camp.isSemi()) {
-                    Intent it = new Intent(TelaJogos.this, TelaSemi.class);
-                    it.putExtra("user", user);
-                    it.putExtra("campKey", campKey);
-                    startActivity(it);
-                    finish();
-                } else if (camp.isFinal()) {
-                    Intent it = new Intent(TelaJogos.this, TelaFinal.class);
-                    it.putExtra("user", user);
-                    it.putExtra("campKey", campKey);
-                    startActivity(it);
-                    finish();
-                } else if (camp.isFinalizado()) {
-                    Intent it = new Intent(TelaJogos.this, TelaPremios.class);
-                    it.putExtra("user", user);
-                    it.putExtra("campKey", campKey);
-                    startActivity(it);
-                    finish();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        campReference.addValueEventListener(mCampListener);
-        campListener2 = mCampListener;
     }
 
 }

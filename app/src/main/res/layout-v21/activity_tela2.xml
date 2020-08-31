@@ -5,10 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fundograma2"
-    tools:context=".TelaNovoCamp">
+    tools:context=".NovoCampFragment">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
+        app:title="Novo Campeonato"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"

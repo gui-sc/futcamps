@@ -1,20 +1,21 @@
 package com.example.ehComplicado;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import android.content.Intent;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.example.ehComplicado.FirebaseHelper.JogadorHelper;
 import com.example.ehComplicado.FirebaseHelper.TimeHelper;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,59 +32,58 @@ import model.dao.CAmareloDAO;
 import model.dao.JogadorDAO;
 import model.dao.PartidaDAO;
 
-public class TelaCartoes extends AppCompatActivity {
-    FirebaseUser user;
-    String campKey;
-    DatabaseReference timeReference, partidaReference, jogadorReference, campReference;
-    TimeHelper timeHelper;
-    JogadorHelper jogadorHelperTime1, jogadorHelperTime2;
+public class TelaCartoes extends Fragment {
+    private FirebaseUser user;
+    private String campKey;
+    private DatabaseReference partidaReference;
+    private DatabaseReference campReference;
     private JogadorDAO jogadorDAO;
     private CAmareloDAO amareloDAO;
     private ListView lstCa;
-    List<Time> times;
-    ValueEventListener partidaListener,campListener;
+    private List<Time> times;
+    private ValueEventListener partidaListener, campListener;
     private Partida partida;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tela_cartoes);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle(R.string.ftc_amarelo);
-        lstCa = findViewById(R.id.ftc_lista_ca);
-        final ListView lstJogadoresCaMandante = findViewById(R.id.ftc_lista__jogadores_ca_mandante);
-        final ListView lstJogadoresCaVisitante = findViewById(R.id.ftc_lista__jogadores_ca_visitante);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_tela_cartoes,container,false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        lstCa = view.findViewById(R.id.ftc_lista_ca);
+        final ListView lstJogadoresCaMandante = view.findViewById(R.id.ftc_lista__jogadores_ca_mandante);
+        final ListView lstJogadoresCaVisitante = view.findViewById(R.id.ftc_lista__jogadores_ca_visitante);
         jogadorDAO = new JogadorDAO();
         amareloDAO = new CAmareloDAO();
         final PartidaDAO partidaDAO = new PartidaDAO();
-        user = getIntent().getParcelableExtra("user");
-        campKey = getIntent().getStringExtra("campKey");
-        partida = getIntent().getParcelableExtra("partida");
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        campKey = getArguments().getString("campKey");
+        partida = getArguments().getParcelable("partida");
         partidaReference = FirebaseDatabase.getInstance().getReference()
                 .child("partidas").child(partida.getId());
         campReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonatos").child(campKey);
-        timeReference = FirebaseDatabase.getInstance().getReference()
+        DatabaseReference timeReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonato-times").child(campKey);
-        timeHelper = new TimeHelper(timeReference);
+        TimeHelper timeHelper = new TimeHelper(timeReference);
         times = timeHelper.retrive();
-        final TextView lblMandante = findViewById(R.id.lbl_mandante);
-        final TextView lblVisitante = findViewById(R.id.lbl_visitante);
-        jogadorReference = FirebaseDatabase.getInstance().getReference()
+        final TextView lblMandante = view.findViewById(R.id.lbl_mandante);
+        final TextView lblVisitante = view.findViewById(R.id.lbl_visitante);
+        DatabaseReference jogadorReference = FirebaseDatabase.getInstance().getReference()
                 .child("time-jogadores").child(partida.getIdMandante());
-        jogadorHelperTime1 = new JogadorHelper(jogadorReference);
+        JogadorHelper jogadorHelperTime1 = new JogadorHelper(jogadorReference);
         jogadorReference = FirebaseDatabase.getInstance().getReference()
                 .child("time-jogadores").child(partida.getIdVisitante());
-        jogadorHelperTime2 = new JogadorHelper(jogadorReference);
-        final ArrayAdapter<Jogador> ca = new ArrayAdapter<>(this, R.layout.personalizado_list_item);
+        JogadorHelper jogadorHelperTime2 = new JogadorHelper(jogadorReference);
+        final ArrayAdapter<Jogador> ca = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item);
         lstCa.setAdapter(ca);
         List<Jogador> primeiraLista1 = jogadorHelperTime1.retrive();
         List<Jogador> primeiraLista2 = jogadorHelperTime2.retrive();
-        final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(this, R.layout.personalizado_list_item, primeiraLista1);
-        final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(this,R.layout.personalizado_list_item,primeiraLista2);
+        final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, primeiraLista1);
+        final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, primeiraLista2);
         ValueEventListener mPartidaListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -121,31 +121,10 @@ public class TelaCartoes extends AppCompatActivity {
                 lstCa.setAdapter(ca);
             }
         });
-    }
-    @Override
-    public void onStop(){
-        super.onStop();
-        if (partidaListener != null) {
-            partidaReference.removeEventListener(partidaListener);
-        }
-        if (campListener != null) {
-            campReference.removeEventListener(campListener);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.ftc_menu_prox, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.ftc_acao_inexperada).setMessage(R.string.ftc_aviso_acao_inexperada)
-                        .setNeutralButton(R.string.ftc_ok, null).show();
-            case R.id.btn_prox:
+        Button btnProx = view.findViewById(R.id.proximo_button);
+        btnProx.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 ValueEventListener mCampListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -153,27 +132,26 @@ public class TelaCartoes extends AppCompatActivity {
                         for (int i = 0; i < lstCa.getCount(); i++) {
                             CAmarelo amarelo = new CAmarelo();
                             Jogador jogador = (Jogador) lstCa.getItemAtPosition(i);
-                            jogador = jogadorDAO.configurar(times,jogador);
+                            jogador = jogadorDAO.configurar(times, jogador);
                             amarelo.setJogador(jogador.getApelido());
                             amarelo.setTime(jogador.getTime().getNome());
                             amareloDAO.inserir(amarelo, partida.getId());
                             if (jogador.isPendurado()) {
                                 jogador.setSuspenso(true);
                                 jogador.setPendurado(false);
-                            } else if ((jogador.getCa()+1)==camp.getCartoesPendurado()){
+                            } else if ((jogador.getCa() + 1) == camp.getCartoesPendurado()) {
                                 jogador.setPendurado(true);
-                            }else{
-                                jogador.setCa(jogador.getCa()+1);
+                            } else {
+                                jogador.setCa(jogador.getCa() + 1);
                             }
-                            jogadorDAO.atualizar(jogador, jogador.getIdTime(),campKey);
+                            jogadorDAO.atualizar(jogador, jogador.getIdTime(), campKey);
                         }
-
-                        Intent it = new Intent(TelaCartoes.this,TelaVermelhos.class);
-                        it.putExtra("user",user);
-                        it.putExtra("campKey",campKey);
-                        it.putExtra("partida",partida);
-                        startActivity(it);
-                        finish();
+                        TelaVermelhos t = new TelaVermelhos();
+                        Bundle data = new Bundle();
+                        data.putString("campKey",campKey);
+                        data.putParcelable("partida",partida);
+                        t.setArguments(data);
+                        openFragment(t);
                     }
 
                     @Override
@@ -183,13 +161,26 @@ public class TelaCartoes extends AppCompatActivity {
                 };
                 campReference.addListenerForSingleValueEvent(mCampListener);
                 campListener = mCampListener;
-
-        }
-        return super.onOptionsItemSelected(item);
+            }
+        });
     }
+
+
     @Override
-    public void onBackPressed() {
-        AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.ftc_acao_inexperada).setMessage(R.string.ftc_aviso_acao_inexperada)
-                .setNeutralButton(R.string.ftc_ok,null).show();
+    public void onStop() {
+        super.onStop();
+        if (partidaListener != null) {
+            partidaReference.removeEventListener(partidaListener);
+        }
+        if (campListener != null) {
+            campReference.removeEventListener(campListener);
+        }
+    }
+
+    public void openFragment(Fragment fragment){
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }

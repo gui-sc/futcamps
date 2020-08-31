@@ -173,4 +173,10 @@
     <string name="nome_de_usuario">Username</string>
     <string name="enviar_email">Send Email</string>
     <string name="faseDeGrupos">Groups</string>
+    <string name="novo_time">Add Team</string>
+    <string name="novo_jogador">Add Player</string>
+    <string name="confirmacao">Confirmation</string>
+    <string name="avisoCaracteres">Your password must contain at least 6 characters…</string>
+    <string name="faseMataMata">Knockout round</string>
+    <string name="mata_mata"><![CDATA[Knockout round ->]]></string>
 </resources>

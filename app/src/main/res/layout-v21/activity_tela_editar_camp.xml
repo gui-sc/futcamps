@@ -16,6 +16,7 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
+            app:title="@string/ftc_editar_campeonato"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
@@ -83,7 +84,7 @@
                 android:layout_marginRight="20dp"/>
 
         </com.google.android.material.textfield.TextInputLayout>
-        <TextView
+       <!-- <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/times"
@@ -101,7 +102,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginBottom="10dp"
-            tools:ignore="NestedScrolling" />
+            tools:ignore="NestedScrolling" />-->
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/premiacao_text_input"

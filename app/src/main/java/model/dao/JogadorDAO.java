@@ -89,7 +89,7 @@ public class JogadorDAO {
         List<Jogador> result = new ArrayList<>();
         for (Jogador jogador : campeonato) {
             if (jogador.getGols() != 0) {
-               result.add(jogador);
+                result.add(jogador);
             }
         }
         Jogador maisGols;

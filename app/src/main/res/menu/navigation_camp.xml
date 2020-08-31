@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/editar_button"
+        android:icon="@drawable/edit_24px"
+        android:title="Editar" />
+
+    <item
+        android:id="@+id/times_button"
+        android:icon="@drawable/shield_32px"
+        android:title="Times" />
+    <item
+        android:id="@+id/tabela_button"
+        android:icon="@drawable/leaderboard_32px"
+        android:title="Tabela" />
+    <item
+        android:id="@+id/jogos_button"
+        android:icon="@drawable/soccer_ball_32px"
+        android:title="Jogos" />
+    <item
+        android:id="@+id/voltar_button"
+        android:icon="@drawable/back_32px"
+        android:title="Voltar" />
+</menu>

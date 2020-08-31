@@ -1,94 +1,87 @@
 package com.example.ehComplicado;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import android.content.Intent;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.ehComplicado.FirebaseHelper.JogadorHelper;
 import com.example.ehComplicado.FirebaseHelper.TimeHelper;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import model.bean.Campeonato;
 import model.bean.Gols;
 import model.bean.Jogador;
 import model.bean.Partida;
 import model.bean.Time;
 import model.dao.GolsDAO;
 import model.dao.JogadorDAO;
-import model.dao.PartidaDAO;
 
-public class TelaGols extends AppCompatActivity {
-    FirebaseUser user;
+public class TelaGols extends Fragment {
+    private FirebaseUser user;
     private Partida partida;
-    String campKey;
+    private String campKey;
     private ListView lstGols;
-    List<Time> times;
-    ValueEventListener partidaListener, campListener2;
-    DatabaseReference timeReference, partidaReference, jogadorReference, campReference;
-    TimeHelper timeHelper;
-    JogadorHelper jogadorHelperTime1, jogadorHelperTime2;
+    private List<Time> times;
+    private ValueEventListener partidaListener;
+    private DatabaseReference partidaReference;
+    private DatabaseReference campReference;
     private GolsDAO golDAO;
     private JogadorDAO jogadorDAO;
-    int golsMandante, golsVisitante;
+    private int golsMandante, golsVisitante;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_gols,container,false);
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gols);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle(R.string.gols);
-        lstGols = findViewById(R.id.ftc_lista_gols);
-        final ListView lstJogadoresGolsMandante = findViewById(R.id.ftc_lista__jogadores_gols_mandante);
-        final ListView lstJogadoresGolsVisitante = findViewById(R.id.ftc_lista_jogadores_gols_visitante);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        lstGols = view.findViewById(R.id.ftc_lista_gols);
+        final ListView lstJogadoresGolsMandante = view.findViewById(R.id.ftc_lista__jogadores_gols_mandante);
+        final ListView lstJogadoresGolsVisitante = view.findViewById(R.id.ftc_lista_jogadores_gols_visitante);
         golDAO = new GolsDAO();
         jogadorDAO = new JogadorDAO();
         golsMandante = 0;
         golsVisitante = 0;
-        user = getIntent().getParcelableExtra("user");
-        campKey = getIntent().getStringExtra("campKey");
-        partida = getIntent().getParcelableExtra("partida");
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        campKey = getArguments().getString("campKey");
+        partida = getArguments().getParcelable("partida");
         partidaReference = FirebaseDatabase.getInstance().getReference()
                 .child("partidas").child(partida.getId());
         campReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonatos").child(campKey);
-        timeReference = FirebaseDatabase.getInstance().getReference()
+        DatabaseReference timeReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonato-times").child(campKey);
-        timeHelper = new TimeHelper(timeReference);
-        final TextView lblMandante = findViewById(R.id.lbl_mandante);
-        final TextView lblVisitante = findViewById(R.id.lbl_visitante);
+        TimeHelper timeHelper = new TimeHelper(timeReference);
+        final TextView lblMandante = view.findViewById(R.id.lbl_mandante);
+        final TextView lblVisitante = view.findViewById(R.id.lbl_visitante);
         times = timeHelper.retrive();
-        jogadorReference = FirebaseDatabase.getInstance().getReference()
+        DatabaseReference jogadorReference = FirebaseDatabase.getInstance().getReference()
                 .child("time-jogadores").child(partida.getIdMandante());
-        jogadorHelperTime1 = new JogadorHelper(jogadorReference);
+        JogadorHelper jogadorHelperTime1 = new JogadorHelper(jogadorReference);
         jogadorReference = FirebaseDatabase.getInstance().getReference()
                 .child("time-jogadores").child(partida.getIdVisitante());
-        jogadorHelperTime2 = new JogadorHelper(jogadorReference);
-        List<Jogador> primeiraLista1 = new ArrayList<>();
-        List<Jogador> primeiraLista2 = new ArrayList<>();
+        JogadorHelper jogadorHelperTime2 = new JogadorHelper(jogadorReference);
+        List<Jogador> primeiraLista1 = jogadorHelperTime1.retrive();
+        List<Jogador> primeiraLista2 = jogadorHelperTime2.retrive();
         Jogador golContraMandante = new Jogador();
         golContraMandante.setApelido("Gol contra");
         Jogador golContraVisitante = new Jogador();
@@ -97,11 +90,9 @@ public class TelaGols extends AppCompatActivity {
         golContraVisitante.setTime(partida.getVisitante());
         primeiraLista1.add(golContraMandante);
         primeiraLista2.add(golContraVisitante);
-        primeiraLista1.addAll(jogadorHelperTime1.retrive());
-        primeiraLista2.addAll(jogadorHelperTime2.retrive());
-        final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(this, R.layout.personalizado_list_item, primeiraLista1);
-        final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(this, R.layout.personalizado_list_item, primeiraLista2);
-        final ArrayAdapter<Jogador> gols = new ArrayAdapter<>(this, R.layout.personalizado_list_item);
+        final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, primeiraLista1);
+        final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, primeiraLista2);
+        final ArrayAdapter<Jogador> gols = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item);
         ValueEventListener mPartidaListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -127,7 +118,7 @@ public class TelaGols extends AppCompatActivity {
                     lstGols.setAdapter(gols);
                     golsMandante++;
                 } else {
-                    Toast.makeText(TelaGols.this, "Limite de gols do " + partida.getNomeMandante() + " atingido...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Limite de gols do " + partida.getNomeMandante() + " atingido...", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -139,7 +130,7 @@ public class TelaGols extends AppCompatActivity {
                     lstGols.setAdapter(gols);
                     golsVisitante++;
                 } else {
-                    Toast.makeText(TelaGols.this, "Limite de gols do " + partida.getNomeVisitante() + " atingido...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Limite de gols do " + partida.getNomeVisitante() + " atingido...", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -156,34 +147,16 @@ public class TelaGols extends AppCompatActivity {
                 lstGols.setAdapter(gols);
             }
         });
-    }
-
-    @Override
-    public void onBackPressed() {
-        AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.ftc_acao_inexperada).setMessage(R.string.ftc_aviso_acao_inexperada)
-                .setNeutralButton(R.string.ftc_ok, null).show();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.ftc_menu_prox, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.ftc_acao_inexperada).setMessage(R.string.ftc_aviso_acao_inexperada)
-                        .setNeutralButton(R.string.ftc_ok, null).show();
-                break;
-            case R.id.btn_prox:
+        Button btnProx = view.findViewById(R.id.proximo_button);
+        btnProx.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 if (golsMandante == partida.getPlacarMandante() && golsVisitante == partida.getPlacarVisitante()) {
                     for (int i = 0; i < lstGols.getCount(); i++) {
                         Gols gol = new Gols();
                         Jogador jogador = (Jogador) lstGols.getItemAtPosition(i);
-                        jogador = jogadorDAO.configurar(times, jogador);
                         if (!jogador.getApelido().equals("Gol contra")) {
+                            jogador = jogadorDAO.configurar(times, jogador);
                             jogador.setGols(jogador.getGols() + 1);
                             gol.setJogador(jogador.getApelido());
                             gol.setTime(jogador.getTime().getNome());
@@ -195,29 +168,30 @@ public class TelaGols extends AppCompatActivity {
                             golDAO.inserir(gol,partida.getId());
                         }
                     }
-                    Intent it = new Intent(TelaGols.this, TelaCartoes.class);
-                    it.putExtra("user", user);
-                    it.putExtra("campKey", campKey);
-                    it.putExtra("partida", partida);
-                    startActivity(it);
-                    finish();
-                    break;
+                    TelaCartoes t = new TelaCartoes();
+                    Bundle data = new Bundle();
+                    data.putParcelable("partida",partida);
+                    data.putString("campKey",campKey);
+                    t.setArguments(data);
+                    openFragment(t);
                 } else {
-                    Toast.makeText(this, "faltam gols...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "faltam gols...", Toast.LENGTH_SHORT).show();
                 }
-        }
-        return super.onOptionsItemSelected(item);
+            }
+        });
     }
-
+    public void openFragment(Fragment fragment){
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
 
     @Override
     public void onStop() {
         super.onStop();
         if (partidaListener != null) {
             partidaReference.removeEventListener(partidaListener);
-        }
-        if (campListener2 != null) {
-            campReference.removeEventListener(campListener2);
         }
     }
 }

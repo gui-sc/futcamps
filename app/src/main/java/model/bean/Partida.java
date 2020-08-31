@@ -187,7 +187,6 @@ public class Partida implements Parcelable {
 
     public Map<String, Object> toMap(){
         Map<String, Object> result = new HashMap<>();
-
         result.put("id",id);
         result.put("idMandante",mandante.getId());
         result.put("idVisitante",visitante.getId());

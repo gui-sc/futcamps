@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/jogos_button"
+        android:icon="@drawable/soccer_ball_32px"
+        android:title="@string/ftc_jogos"/>
+    <item
+        android:id="@+id/artilheiros_button"
+        android:icon="@drawable/soccer_32px"
+        android:title="@string/ftc_artilheiros" />
+    <item
+        android:id="@+id/pendurados_button"
+        android:icon="@drawable/soccer_card_32px"
+        android:title="@string/ftc_pendurados" />
+    <item
+        android:id="@+id/suspensos_button"
+        android:icon="@drawable/soccer_card_32px"
+        android:title="@string/ftc_suspensos" />
+    <item
+        android:id="@+id/voltar_button"
+        android:icon="@drawable/back_32px"
+        android:title="@string/ftc_voltar" />
+
+</menu>

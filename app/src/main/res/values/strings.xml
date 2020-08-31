@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">FutCamps</string>
-    <string name="formato_prompt">formato</string>
+    <string name="formato_prompt">Formato</string>
     <string name="fasedegrupos">Fase de Grupos + Mata-Mata</string>
     <string name="matamata">Mata-Mata</string>
     <string-array name="formato">
@@ -67,10 +67,10 @@
     <string name="ftc_editar">Editar</string>
     <string name="ftc_voltar">Voltar</string>
     <string name="ftc_editar_campeonato">Editar Campeonato</string>
-    <string name="ftc_editar_time">Editar time</string>
-    <string name="ftc_apagar_time">apagar time</string>
+    <string name="ftc_editar_time">Editar Time</string>
+    <string name="ftc_apagar_time">Apagar Time</string>
     <string name="ftc_editar_jogador">Editar Jogador</string>
-    <string name="ftc_apagar_jogador">apagar jogador</string>
+    <string name="ftc_apagar_jogador">Apagar Jogador</string>
     <string name="ftc_adicionar">Adicionar</string>
     <string name="ftc_adicionar_jogador">Adicionar Jogador</string>
     <string name="ftc_hint_apelido">Apelido</string>
@@ -231,4 +231,10 @@
     <string name="nome_de_usuario">Nome de Usuário</string>
     <string name="enviar_email">Enviar Email</string>
     <string name="faseDeGrupos">Grupos</string>
+    <string name="novo_time">Novo Time</string>
+    <string name="novo_jogador">Adicionar Jogador</string>
+    <string name="confirmacao">Confirmação</string>
+    <string name="avisoCaracteres">Sua senha deve conter no mínimo 6 caracteres…</string>
+    <string name="faseMataMata">Fase de mata-mata</string>
+    <string name="mata_mata"><![CDATA[Mata-mata ->]]></string>
 </resources>

@@ -1,34 +1,27 @@
 package com.example.ehComplicado;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.ehComplicado.FirebaseHelper.PartidaHelper;
 import com.example.ehComplicado.FirebaseHelper.TimeHelper;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.mikepenz.materialdrawer.AccountHeader;
-import com.mikepenz.materialdrawer.AccountHeaderBuilder;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,363 +31,90 @@ import model.bean.Partida;
 import model.bean.Time;
 import model.dao.PartidaDAO;
 
-public class TelaOitavas extends AppCompatActivity {
-    AccountHeader headerNavigation;
-    DatabaseReference partidaReference, timeReference, campReference;
-    FirebaseUser user;
-    ValueEventListener partidaListener, campListener, campListener2, campListener3;
+public class TelaOitavas extends Fragment {
+    private DatabaseReference campReference;
+    private ValueEventListener campListener, campListener2, campListener3,campListener4,campListener5;
     private String campKey;
-    Toolbar toolbar;
-    PartidaHelper partidaHelper;
-    TimeHelper timeHelper;
+    List<Partida> partidas1 = new ArrayList<>();
+    private String fase;
+    private List<Partida> partidas = new ArrayList<>();
+    private List<Partida> partidasGeral;
+    PartidaDAO partidaDAO;
+    private List<Time> times;
+    TextView lblAnt, lblAtual, lblDepois, lblMandantePartida1, lblMandantePartida2,
+            lblMandantePartida3, lblMandantePartida4, lblMandantePlacar1, lblMandantePlacar2, lblMandantePlacar3, lblMandantePlacar4, lblVisitantePlacar1, lblVisitantePlacar2, lblVisitantePlacar3, lblVisitantePlacar4, lblMandantePenaltis1, lblMandantePenaltis2, lblMandantePenaltis3, lblMandantePenaltis4, lblVisitantePartida1, lblVisitantePartida2, lblVisitantePartida3,
+            lblVisitantePartida4, lblVisitantePenaltis1, lblVisitantePenaltis2, lblVisitantePenaltis3, lblVisitantePenaltis4, lblX3, lblX4, lblX1, lblX2;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tela_oitavas);
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.ftc_oitavas_de_final);
-        final TextView lblMandantePartida1 = findViewById(R.id.lbl_mandante_partida1);
-        final TextView lblMandantePartida2 = findViewById(R.id.lbl_mandante_partida2);
-        final TextView lblMandantePartida3 = findViewById(R.id.lbl_mandante_partida3);
-        final TextView lblMandantePartida4 = findViewById(R.id.lbl_mandante_partida4);
-        final TextView lblMandantePlacar1 = findViewById(R.id.lbl_placar_mandante_partida1);
-        final TextView lblMandantePlacar2 = findViewById(R.id.lbl_placar_mandante_partida2);
-        final TextView lblMandantePlacar3 = findViewById(R.id.lbl_placar_mandante_partida3);
-        final TextView lblMandantePlacar4 = findViewById(R.id.lbl_placar_mandante_partida4);
-        final TextView lblVisitantePlacar1 = findViewById(R.id.lbl_placar_visitante_partida1);
-        final TextView lblVisitantePlacar2 = findViewById(R.id.lbl_placar_visitante_partida2);
-        final TextView lblVisitantePlacar3 = findViewById(R.id.lbl_placar_visitante_partida3);
-        final TextView lblVisitantePlacar4 = findViewById(R.id.lbl_placar_visitante_partida4);
-        final TextView lblMandantePenaltis1 = findViewById(R.id.lbl_penalti_mandante_partida1);
-        final TextView lblMandantePenaltis2 = findViewById(R.id.lbl_penalti_mandante_partida2);
-        final TextView lblMandantePenaltis3 = findViewById(R.id.lbl_penalti_mandante_partida3);
-        final TextView lblMandantePenaltis4 = findViewById(R.id.lbl_penalti_mandante_partida4);
-        final TextView lblVisitantePartida1 = findViewById(R.id.lbl_visitante_partida1);
-        final TextView lblVisitantePartida2 = findViewById(R.id.lbl_visitante_partida2);
-        final TextView lblVisitantePartida3 = findViewById(R.id.lbl_visitante_partida3);
-        final TextView lblVisitantePartida4 = findViewById(R.id.lbl_visitante_partida4);
-        final TextView lblVisitantePenaltis1 = findViewById(R.id.lbl_penalti_visitante_partida1);
-        final TextView lblVisitantePenaltis2 = findViewById(R.id.lbl_penalti_visitante_partida2);
-        final TextView lblVisitantePenaltis3 = findViewById(R.id.lbl_penalti_visitante_partida3);
-        final TextView lblVisitantePenaltis4 = findViewById(R.id.lbl_penalti_visitante_partida4);
-        final TextView lblMandantePartida5 = findViewById(R.id.lbl_mandante_partida5);
-        final TextView lblMandantePartida6 = findViewById(R.id.lbl_mandante_partida6);
-        final TextView lblMandantePartida7 = findViewById(R.id.lbl_mandante_partida7);
-        final TextView lblMandantePartida8 = findViewById(R.id.lbl_mandante_partida8);
-        final TextView lblMandantePlacar5 = findViewById(R.id.lbl_placar_mandante_partida5);
-        final TextView lblMandantePlacar6 = findViewById(R.id.lbl_placar_mandante_partida6);
-        final TextView lblMandantePlacar7 = findViewById(R.id.lbl_placar_mandante_partida7);
-        final TextView lblMandantePlacar8 = findViewById(R.id.lbl_placar_mandante_partida8);
-        final TextView lblVisitantePlacar5 = findViewById(R.id.lbl_placar_visitante_partida5);
-        final TextView lblVisitantePlacar6 = findViewById(R.id.lbl_placar_visitante_partida6);
-        final TextView lblVisitantePlacar7 = findViewById(R.id.lbl_placar_visitante_partida7);
-        final TextView lblVisitantePlacar8 = findViewById(R.id.lbl_placar_visitante_partida8);
-        final TextView lblMandantePenaltis5 = findViewById(R.id.lbl_penalti_mandante_partida5);
-        final TextView lblMandantePenaltis6 = findViewById(R.id.lbl_penalti_mandante_partida6);
-        final TextView lblMandantePenaltis7 = findViewById(R.id.lbl_penalti_mandante_partida7);
-        final TextView lblMandantePenaltis8 = findViewById(R.id.lbl_penalti_mandante_partida8);
-        final TextView lblVisitantePartida5 = findViewById(R.id.lbl_visitante_partida5);
-        final TextView lblVisitantePartida6 = findViewById(R.id.lbl_visitante_partida6);
-        final TextView lblVisitantePartida7 = findViewById(R.id.lbl_visitante_partida7);
-        final TextView lblVisitantePartida8 = findViewById(R.id.lbl_visitante_partida8);
-        final TextView lblVisitantePenaltis5 = findViewById(R.id.lbl_penalti_visitante_partida5);
-        final TextView lblVisitantePenaltis6 = findViewById(R.id.lbl_penalti_visitante_partida6);
-        final TextView lblVisitantePenaltis7 = findViewById(R.id.lbl_penalti_visitante_partida7);
-        final TextView lblVisitantePenaltis8 = findViewById(R.id.lbl_penalti_visitante_partida8);
-        final TextView lblX3 = findViewById(R.id.lblX3);
-        final TextView lblX4 = findViewById(R.id.lblX4);
-        final TextView lblX5 = findViewById(R.id.lblX5);
-        final TextView lblX6 = findViewById(R.id.lblX6);
-        final TextView lblX7 = findViewById(R.id.lblX7);
-        final TextView lblX8 = findViewById(R.id.lblX8);
-        final PartidaDAO partidaDAO = new PartidaDAO();
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_tela_oitavas, container, false);
+    }
 
-        user = getIntent().getParcelableExtra("user");
-        campKey = getIntent().getStringExtra("campKey");
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        lblMandantePartida1 = view.findViewById(R.id.lbl_mandante_partida1);
+        lblMandantePartida2 = view.findViewById(R.id.lbl_mandante_partida2);
+        lblMandantePartida3 = view.findViewById(R.id.lbl_mandante_partida3);
+        lblMandantePartida4 = view.findViewById(R.id.lbl_mandante_partida4);
+        lblMandantePlacar1 = view.findViewById(R.id.lbl_placar_mandante_partida1);
+        lblMandantePlacar2 = view.findViewById(R.id.lbl_placar_mandante_partida2);
+        lblMandantePlacar3 = view.findViewById(R.id.lbl_placar_mandante_partida3);
+        lblMandantePlacar4 = view.findViewById(R.id.lbl_placar_mandante_partida4);
+        lblVisitantePlacar1 = view.findViewById(R.id.lbl_placar_visitante_partida1);
+        lblVisitantePlacar2 = view.findViewById(R.id.lbl_placar_visitante_partida2);
+        lblVisitantePlacar3 = view.findViewById(R.id.lbl_placar_visitante_partida3);
+        lblVisitantePlacar4 = view.findViewById(R.id.lbl_placar_visitante_partida4);
+        lblMandantePenaltis1 = view.findViewById(R.id.lbl_penalti_mandante_partida1);
+        lblMandantePenaltis2 = view.findViewById(R.id.lbl_penalti_mandante_partida2);
+        lblMandantePenaltis3 = view.findViewById(R.id.lbl_penalti_mandante_partida3);
+        lblMandantePenaltis4 = view.findViewById(R.id.lbl_penalti_mandante_partida4);
+        lblVisitantePartida1 = view.findViewById(R.id.lbl_visitante_partida1);
+        lblVisitantePartida2 = view.findViewById(R.id.lbl_visitante_partida2);
+        lblVisitantePartida3 = view.findViewById(R.id.lbl_visitante_partida3);
+        lblVisitantePartida4 = view.findViewById(R.id.lbl_visitante_partida4);
+        lblVisitantePenaltis1 = view.findViewById(R.id.lbl_penalti_visitante_partida1);
+        lblVisitantePenaltis2 = view.findViewById(R.id.lbl_penalti_visitante_partida2);
+        lblVisitantePenaltis3 = view.findViewById(R.id.lbl_penalti_visitante_partida3);
+        lblVisitantePenaltis4 = view.findViewById(R.id.lbl_penalti_visitante_partida4);
+        lblX3 = view.findViewById(R.id.lblX3);
+        lblX4 = view.findViewById(R.id.lblX4);
+        lblX1 = view.findViewById(R.id.lblX1);
+        lblX2 = view.findViewById(R.id.lblX2);
+        lblAnt = view.findViewById(R.id.lbl_antes);
+        lblAtual = view.findViewById(R.id.lbl_atual);
+        lblDepois = view.findViewById(R.id.lbl_depois);
+
+        partidaDAO = new PartidaDAO();
+
+
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        campKey = getArguments().getString("campKey");
         campReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonatos").child(campKey);
-        partidaReference = FirebaseDatabase.getInstance().getReference()
+        DatabaseReference partidaReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonato-partidas").child(campKey);
-        timeReference = FirebaseDatabase.getInstance().getReference()
+        DatabaseReference timeReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonato-times").child(campKey);
-        timeHelper = new TimeHelper(timeReference);
-        partidaHelper = new PartidaHelper(partidaReference);
-        final List<Partida> partidasGeral = partidaHelper.retrive();
-        final List<Time> times = timeHelper.retrive();
+        TimeHelper timeHelper = new TimeHelper(timeReference);
+        PartidaHelper partidaHelper = new PartidaHelper(partidaReference);
+        partidasGeral = partidaHelper.retrive();
+        times = timeHelper.retrive();
         ValueEventListener mCampListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Campeonato camp = dataSnapshot.getValue(Campeonato.class);
-                if (!camp.isFinalizado()) {
-                    createDrawer();
+                if (camp.isOitavas()) {
+                    trocarDeFase("oitavas1");
+                } else if (camp.isQuartas()) {
+                    trocarDeFase("quartas");
+                } else if (camp.isSemi()) {
+                    trocarDeFase("semi");
                 } else {
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    trocarDeFase("final");
                 }
-                final List<Partida> partidas1 = partidaDAO.listarFase(partidasGeral, "oitavas");
-                final List<Partida> partidas = new ArrayList<>();
-                for (Partida partida : partidas1) {
-                    partida = partidaDAO.configurar(times, partida);
-                    partidas.add(partida);
-                }
-                if (partidas.size() == 4) {
-                    if (partidas.get(0).isCadastrada()) {
-                        lblMandantePartida1.setText(partidas.get(0).getNomeMandante());
-                        lblVisitantePartida1.setText(partidas.get(0).getNomeVisitante());
-                        lblMandantePlacar1.setText(String.valueOf(partidas.get(0).getPlacarMandante()));
-                        lblVisitantePlacar1.setText(String.valueOf(partidas.get(0).getPlacarVisitante()));
-                        if (partidas.get(0).getPenaltisMandante() != 0 && partidas.get(0).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis1.setText(String.valueOf(partidas.get(0).getPenaltisMandante()));
-                            lblVisitantePenaltis1.setText(String.valueOf(partidas.get(0).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida1.setText(partidas.get(0).getNomeMandante());
-                        lblVisitantePartida1.setText(partidas.get(0).getNomeVisitante());
-                    }
-                    if (partidas.get(1).isCadastrada()) {
-                        lblMandantePartida2.setText(partidas.get(1).getNomeMandante());
-                        lblVisitantePartida2.setText(partidas.get(1).getNomeVisitante());
-                        lblMandantePlacar2.setText(String.valueOf(partidas.get(1).getPlacarMandante()));
-                        lblVisitantePlacar2.setText(String.valueOf(partidas.get(1).getPlacarVisitante()));
-                        if (partidas.get(1).getPenaltisMandante() != 0 && partidas.get(1).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis2.setText(String.valueOf(partidas.get(1).getPenaltisMandante()));
-                            lblVisitantePenaltis2.setText(String.valueOf(partidas.get(1).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida2.setText(partidas.get(1).getNomeMandante());
-                        lblVisitantePartida2.setText(partidas.get(1).getNomeVisitante());
-                    }
-                    if (partidas.get(2).isCadastrada()) {
-                        lblMandantePartida3.setText(partidas.get(2).getNomeMandante());
-                        lblVisitantePartida3.setText(partidas.get(2).getNomeVisitante());
-                        lblMandantePlacar3.setText(String.valueOf(partidas.get(2).getPlacarMandante()));
-                        lblVisitantePlacar3.setText(String.valueOf(partidas.get(2).getPlacarVisitante()));
-                        if (partidas.get(2).getPenaltisMandante() != 0 && partidas.get(2).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis3.setText(String.valueOf(partidas.get(2).getPenaltisMandante()));
-                            lblVisitantePenaltis3.setText(String.valueOf(partidas.get(2).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida3.setText(partidas.get(2).getNomeMandante());
-                        lblVisitantePartida3.setText(partidas.get(2).getNomeVisitante());
-                    }
-                    if (partidas.get(3).isCadastrada()) {
-                        lblMandantePartida4.setText(partidas.get(3).getNomeMandante());
-                        lblVisitantePartida4.setText(partidas.get(3).getNomeVisitante());
-                        lblMandantePlacar4.setText(String.valueOf(partidas.get(3).getPlacarMandante()));
-                        lblVisitantePlacar4.setText(String.valueOf(partidas.get(3).getPlacarVisitante()));
-                        if (partidas.get(3).getPenaltisMandante() != 0 && partidas.get(3).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis4.setText(String.valueOf(partidas.get(3).getPenaltisMandante()));
-                            lblVisitantePenaltis4.setText(String.valueOf(partidas.get(3).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida4.setText(partidas.get(3).getNomeMandante());
-                        lblVisitantePartida4.setText(partidas.get(3).getNomeVisitante());
-                    }
-                    lblMandantePartida5.setVisibility(View.INVISIBLE);
-                    lblVisitantePartida5.setVisibility(View.INVISIBLE);
-                    lblMandantePartida6.setVisibility(View.INVISIBLE);
-                    lblVisitantePartida6.setVisibility(View.INVISIBLE);
-                    lblMandantePartida7.setVisibility(View.INVISIBLE);
-                    lblVisitantePartida7.setVisibility(View.INVISIBLE);
-                    lblMandantePartida8.setVisibility(View.INVISIBLE);
-                    lblVisitantePartida8.setVisibility(View.INVISIBLE);
-                    lblMandantePlacar5.setVisibility(View.INVISIBLE);
-                    lblVisitantePlacar5.setVisibility(View.INVISIBLE);
-                    lblMandantePlacar6.setVisibility(View.INVISIBLE);
-                    lblVisitantePlacar6.setVisibility(View.INVISIBLE);
-                    lblMandantePlacar7.setVisibility(View.INVISIBLE);
-                    lblVisitantePlacar7.setVisibility(View.INVISIBLE);
-                    lblMandantePlacar8.setVisibility(View.INVISIBLE);
-                    lblVisitantePlacar8.setVisibility(View.INVISIBLE);
-                    lblMandantePenaltis5.setVisibility(View.INVISIBLE);
-                    lblVisitantePenaltis5.setVisibility(View.INVISIBLE);
-                    lblMandantePenaltis6.setVisibility(View.INVISIBLE);
-                    lblVisitantePenaltis6.setVisibility(View.INVISIBLE);
-                    lblMandantePenaltis7.setVisibility(View.INVISIBLE);
-                    lblVisitantePenaltis7.setVisibility(View.INVISIBLE);
-                    lblMandantePenaltis8.setVisibility(View.INVISIBLE);
-                    lblVisitantePenaltis8.setVisibility(View.INVISIBLE);
-                    lblX5.setVisibility(View.INVISIBLE);
-                    lblX7.setVisibility(View.INVISIBLE);
-                    lblX7.setVisibility(View.INVISIBLE);
-                    lblX8.setVisibility(View.INVISIBLE);
-                } else if (partidas.size() == 2) {
-                    if (partidas.get(0).isCadastrada()) {
-                        lblMandantePartida1.setText(partidas.get(0).getNomeMandante());
-                        lblVisitantePartida1.setText(partidas.get(0).getNomeVisitante());
-                        lblMandantePlacar1.setText(String.valueOf(partidas.get(0).getPlacarMandante()));
-                        lblVisitantePlacar1.setText(String.valueOf(partidas.get(0).getPlacarVisitante()));
-                        if (partidas.get(0).getPenaltisMandante() != 0 && partidas.get(0).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis1.setText(String.valueOf(partidas.get(0).getPenaltisMandante()));
-                            lblVisitantePenaltis1.setText(String.valueOf(partidas.get(0).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida1.setText(partidas.get(0).getNomeMandante());
-                        lblVisitantePartida1.setText(partidas.get(0).getNomeVisitante());
-                    }
-                    if (partidas.get(1).isCadastrada()) {
-                        lblMandantePartida2.setText(partidas.get(1).getNomeMandante());
-                        lblVisitantePartida2.setText(partidas.get(1).getNomeVisitante());
-                        lblMandantePlacar2.setText(String.valueOf(partidas.get(1).getPlacarMandante()));
-                        lblVisitantePlacar2.setText(String.valueOf(partidas.get(1).getPlacarVisitante()));
-                        if (partidas.get(1).getPenaltisMandante() != 0 && partidas.get(1).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis2.setText(String.valueOf(partidas.get(1).getPenaltisMandante()));
-                            lblVisitantePenaltis2.setText(String.valueOf(partidas.get(1).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida2.setText(partidas.get(1).getNomeMandante());
-                        lblVisitantePartida2.setText(partidas.get(1).getNomeVisitante());
-                    }
-                    lblMandantePartida3.setVisibility(View.INVISIBLE);
-                    lblVisitantePartida3.setVisibility(View.INVISIBLE);
-                    lblMandantePartida4.setVisibility(View.INVISIBLE);
-                    lblVisitantePartida4.setVisibility(View.INVISIBLE);
-                    lblMandantePartida5.setVisibility(View.INVISIBLE);
-                    lblVisitantePartida5.setVisibility(View.INVISIBLE);
-                    lblMandantePartida6.setVisibility(View.INVISIBLE);
-                    lblVisitantePartida6.setVisibility(View.INVISIBLE);
-                    lblMandantePartida7.setVisibility(View.INVISIBLE);
-                    lblVisitantePartida7.setVisibility(View.INVISIBLE);
-                    lblMandantePartida8.setVisibility(View.INVISIBLE);
-                    lblVisitantePartida8.setVisibility(View.INVISIBLE);
-                    lblMandantePlacar3.setVisibility(View.INVISIBLE);
-                    lblVisitantePlacar3.setVisibility(View.INVISIBLE);
-                    lblMandantePlacar4.setVisibility(View.INVISIBLE);
-                    lblVisitantePlacar4.setVisibility(View.INVISIBLE);
-                    lblMandantePlacar5.setVisibility(View.INVISIBLE);
-                    lblVisitantePlacar5.setVisibility(View.INVISIBLE);
-                    lblMandantePlacar6.setVisibility(View.INVISIBLE);
-                    lblVisitantePlacar6.setVisibility(View.INVISIBLE);
-                    lblMandantePlacar7.setVisibility(View.INVISIBLE);
-                    lblVisitantePlacar7.setVisibility(View.INVISIBLE);
-                    lblMandantePlacar8.setVisibility(View.INVISIBLE);
-                    lblVisitantePlacar8.setVisibility(View.INVISIBLE);
-                    lblMandantePenaltis3.setVisibility(View.INVISIBLE);
-                    lblVisitantePenaltis3.setVisibility(View.INVISIBLE);
-                    lblMandantePenaltis4.setVisibility(View.INVISIBLE);
-                    lblVisitantePenaltis4.setVisibility(View.INVISIBLE);
-                    lblMandantePenaltis5.setVisibility(View.INVISIBLE);
-                    lblVisitantePenaltis5.setVisibility(View.INVISIBLE);
-                    lblMandantePenaltis6.setVisibility(View.INVISIBLE);
-                    lblVisitantePenaltis6.setVisibility(View.INVISIBLE);
-                    lblMandantePenaltis7.setVisibility(View.INVISIBLE);
-                    lblVisitantePenaltis7.setVisibility(View.INVISIBLE);
-                    lblMandantePenaltis8.setVisibility(View.INVISIBLE);
-                    lblVisitantePenaltis8.setVisibility(View.INVISIBLE);
-                    lblX3.setVisibility(View.INVISIBLE);
-                    lblX4.setVisibility(View.INVISIBLE);
-                    lblX5.setVisibility(View.INVISIBLE);
-                    lblX7.setVisibility(View.INVISIBLE);
-                    lblX7.setVisibility(View.INVISIBLE);
-                    lblX8.setVisibility(View.INVISIBLE);
-                } else if (partidas.size() == 8) {
-                    if (partidas.get(0).isCadastrada()) {
-                        lblMandantePartida1.setText(partidas.get(0).getNomeMandante());
-                        lblVisitantePartida1.setText(partidas.get(0).getNomeVisitante());
-                        lblMandantePlacar1.setText(String.valueOf(partidas.get(0).getPlacarMandante()));
-                        lblVisitantePlacar1.setText(String.valueOf(partidas.get(0).getPlacarVisitante()));
-                        if (partidas.get(0).getPenaltisMandante() != 0 && partidas.get(0).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis1.setText(String.valueOf(partidas.get(0).getPenaltisMandante()));
-                            lblVisitantePenaltis1.setText(String.valueOf(partidas.get(0).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida1.setText(partidas.get(0).getNomeMandante());
-                        lblVisitantePartida1.setText(partidas.get(0).getNomeVisitante());
-                    }
-                    if (partidas.get(1).isCadastrada()) {
-                        lblMandantePartida2.setText(partidas.get(1).getNomeMandante());
-                        lblVisitantePartida2.setText(partidas.get(1).getNomeVisitante());
-                        lblMandantePlacar2.setText(String.valueOf(partidas.get(1).getPlacarMandante()));
-                        lblVisitantePlacar2.setText(String.valueOf(partidas.get(1).getPlacarVisitante()));
-                        if (partidas.get(1).getPenaltisMandante() != 0 && partidas.get(1).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis2.setText(String.valueOf(partidas.get(1).getPenaltisMandante()));
-                            lblVisitantePenaltis2.setText(String.valueOf(partidas.get(1).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida2.setText(partidas.get(1).getNomeMandante());
-                        lblVisitantePartida2.setText(partidas.get(1).getNomeVisitante());
-                    }
-                    if (partidas.get(2).isCadastrada()) {
-                        lblMandantePartida3.setText(partidas.get(2).getNomeMandante());
-                        lblVisitantePartida3.setText(partidas.get(2).getNomeVisitante());
-                        lblMandantePlacar3.setText(String.valueOf(partidas.get(2).getPlacarMandante()));
-                        lblVisitantePlacar3.setText(String.valueOf(partidas.get(2).getPlacarVisitante()));
-                        if (partidas.get(2).getPenaltisMandante() != 0 && partidas.get(2).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis3.setText(String.valueOf(partidas.get(2).getPenaltisMandante()));
-                            lblVisitantePenaltis3.setText(String.valueOf(partidas.get(2).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida3.setText(partidas.get(2).getNomeMandante());
-                        lblVisitantePartida3.setText(partidas.get(2).getNomeVisitante());
-                    }
-                    if (partidas.get(3).isCadastrada()) {
-                        lblMandantePartida4.setText(partidas.get(3).getNomeMandante());
-                        lblVisitantePartida4.setText(partidas.get(3).getNomeVisitante());
-                        lblMandantePlacar4.setText(String.valueOf(partidas.get(3).getPlacarMandante()));
-                        lblVisitantePlacar4.setText(String.valueOf(partidas.get(3).getPlacarVisitante()));
-                        if (partidas.get(3).getPenaltisMandante() != 0 && partidas.get(3).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis4.setText(String.valueOf(partidas.get(3).getPenaltisMandante()));
-                            lblVisitantePenaltis4.setText(String.valueOf(partidas.get(3).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida4.setText(partidas.get(3).getNomeMandante());
-                        lblVisitantePartida4.setText(partidas.get(3).getNomeVisitante());
-                    }
-                    if (partidas.get(4).isCadastrada()) {
-                        lblMandantePartida5.setText(partidas.get(4).getNomeMandante());
-                        lblVisitantePartida5.setText(partidas.get(4).getNomeVisitante());
-                        lblMandantePlacar5.setText(String.valueOf(partidas.get(4).getPlacarMandante()));
-                        lblVisitantePlacar5.setText(String.valueOf(partidas.get(4).getPlacarVisitante()));
-                        if (partidas.get(4).getPenaltisMandante() != 0 && partidas.get(4).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis5.setText(String.valueOf(partidas.get(4).getPenaltisMandante()));
-                            lblVisitantePenaltis5.setText(String.valueOf(partidas.get(4).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida5.setText(partidas.get(4).getNomeMandante());
-                        lblVisitantePartida5.setText(partidas.get(4).getNomeVisitante());
-                    }
-                    if (partidas.get(5).isCadastrada()) {
-                        lblMandantePartida6.setText(partidas.get(5).getNomeMandante());
-                        lblVisitantePartida6.setText(partidas.get(5).getNomeVisitante());
-                        lblMandantePlacar6.setText(String.valueOf(partidas.get(5).getPlacarMandante()));
-                        lblVisitantePlacar6.setText(String.valueOf(partidas.get(5).getPlacarVisitante()));
-                        if (partidas.get(5).getPenaltisMandante() != 0 && partidas.get(5).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis6.setText(String.valueOf(partidas.get(5).getPenaltisMandante()));
-                            lblVisitantePenaltis6.setText(String.valueOf(partidas.get(5).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida6.setText(partidas.get(5).getNomeMandante());
-                        lblVisitantePartida6.setText(partidas.get(5).getNomeVisitante());
-                    }
-                    if (partidas.get(6).isCadastrada()) {
-                        lblMandantePartida7.setText(partidas.get(6).getNomeMandante());
-                        lblVisitantePartida7.setText(partidas.get(6).getNomeVisitante());
-                        lblMandantePlacar7.setText(String.valueOf(partidas.get(6).getPlacarMandante()));
-                        lblVisitantePlacar7.setText(String.valueOf(partidas.get(6).getPlacarVisitante()));
-                        if (partidas.get(6).getPenaltisMandante() != 0 && partidas.get(6).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis7.setText(String.valueOf(partidas.get(6).getPenaltisMandante()));
-                            lblVisitantePenaltis7.setText(String.valueOf(partidas.get(6).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida7.setText(partidas.get(6).getNomeMandante());
-                        lblVisitantePartida7.setText(partidas.get(6).getNomeVisitante());
-                    }
-                    if (partidas.get(7).isCadastrada()) {
-                        lblMandantePartida8.setText(partidas.get(7).getNomeMandante());
-                        lblVisitantePartida8.setText(partidas.get(7).getNomeVisitante());
-                        lblMandantePlacar8.setText(String.valueOf(partidas.get(7).getPlacarMandante()));
-                        lblVisitantePlacar8.setText(String.valueOf(partidas.get(7).getPlacarVisitante()));
-                        if (partidas.get(7).getPenaltisMandante() != 0 && partidas.get(7).getPenaltisVisitante() != 0) {
-                            lblMandantePenaltis8.setText(String.valueOf(partidas.get(7).getPenaltisMandante()));
-                            lblVisitantePenaltis8.setText(String.valueOf(partidas.get(7).getPenaltisVisitante()));
-                        }
-                    } else {
-                        lblMandantePartida8.setText(partidas.get(7).getNomeMandante());
-                        lblVisitantePartida8.setText(partidas.get(7).getNomeVisitante());
-                    }
-                }
+
             }
 
             @Override
@@ -404,15 +124,772 @@ public class TelaOitavas extends AppCompatActivity {
         };
         campReference.addListenerForSingleValueEvent(mCampListener);
         campListener = mCampListener;
+        lblAnt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ValueEventListener eventListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Campeonato camp = dataSnapshot.getValue(Campeonato.class);
+                        if (fase.equals("oitavas1")) {
+                            if (camp.getFormato().equals("Fase de Grupos + Mata-Mata")
+                                    || camp.getFormato().equals("Group Stage + Knockout Round")) {
+                                trocarDeFase("faseDeGrupos");
+                            }
+                        } else if (fase.equals("oitavas2")) {
+                            trocarDeFase("oitavas1");
+                        } else if (fase.equals("quartas")) {
+                            if ((camp.getNumGrupos() * camp.getClassificados() > 13) ||
+                                    ((camp.getFormato().equals("Mata-Mata") || camp.getFormato().equals("Knockout Round")) && camp.getNumTimes() > 13)) {
+                                trocarDeFase("oitavas2");
+                            } else if ((camp.getNumGrupos() * camp.getClassificados() > 9) ||
+                                    ((camp.getFormato().equals("Mata-Mata") || camp.getFormato().equals("Knockout Round")) && camp.getNumTimes() > 9)) {
+                                trocarDeFase("oitavas1");
+                            } else {
+                                if (camp.getFormato().equals("Fase de Grupos + Mata-Mata")
+                                        || camp.getFormato().equals("Group Stage + Knockout Round")) {
+                                    trocarDeFase("faseDeGrupos");
+                                }
+                            }
+                        } else if (fase.equals("semi")) {
+                            if (camp.getNumGrupos() * camp.getClassificados() == 4) {
+                                trocarDeFase("faseDeGrupos");
+                            } else {
+                                trocarDeFase("quartas");
+                            }
+                        } else if (fase.equals("final")) {
+                            if (camp.getNumGrupos() * camp.getClassificados() == 2) {
+                                trocarDeFase("faseDeGrupos");
+                            } else {
+                                trocarDeFase("semi");
+                            }
+                        }
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                };
+                campReference.addListenerForSingleValueEvent(eventListener);
+                campListener2 = eventListener;
+            }
+        });
+
+        final Button btnJogos = view.findViewById(R.id.jogos_button);
+        btnJogos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ValueEventListener eventListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Campeonato camp = dataSnapshot.getValue(Campeonato.class);
+                        Intent it = new Intent(getContext(),TelaPrincipalJogos.class);
+                        it.putExtra("camp",camp);
+                        startActivity(it);
+                        getActivity().finish();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                };
+                campReference.addListenerForSingleValueEvent(eventListener);
+                campListener4 = eventListener;
+
+            }
+        });
+        ValueEventListener eventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Campeonato campeonato = dataSnapshot.getValue(Campeonato.class);
+                if(user.getUid().equals(campeonato.getUid())){
+                    btnJogos.setVisibility(View.INVISIBLE);
+                    btnJogos.setClickable(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        campReference.addListenerForSingleValueEvent(eventListener);
+        campListener5 = eventListener;
+        lblDepois.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ValueEventListener eventListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Campeonato camp = dataSnapshot.getValue(Campeonato.class);
+                        if (fase.equals("oitavas1")) {
+                            if ((camp.getNumGrupos() * camp.getClassificados() > 13) ||
+                                    ((camp.getFormato().equals("Mata-Mata") || camp.getFormato().equals("Knockout Round")) && camp.getNumTimes() > 13)) {
+                                trocarDeFase("oitavas2");
+                            } else if ((camp.getNumGrupos() * camp.getClassificados() > 9) ||
+                                    ((camp.getFormato().equals("Mata-Mata") || camp.getFormato().equals("Knockout Round")) && camp.getNumTimes() > 9)) {
+                                if (!camp.isOitavas()) {
+                                    trocarDeFase("quartas");
+                                }
+                            }
+                        } else if (fase.equals("oitavas2")) {
+                            if (!camp.isOitavas()) {
+                                trocarDeFase("quartas");
+                            }
+                        } else if (fase.equals("quartas")) {
+                            if (!camp.isQuartas()) {
+                                trocarDeFase("semi");
+                            }
+                        } else if (fase.equals("semi")) {
+                            if (!camp.isSemi()) {
+                                trocarDeFase("final");
+                            }
+                        } else if (fase.equals("final")) {
+                            if (!camp.isFinal()) {
+                                trocarDeFase("premios");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                };
+                campReference.addListenerForSingleValueEvent(eventListener);
+                campListener3 = eventListener;
+            }
+        });
+    }
+
+    public void openFragment(Fragment fragment) {
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    private void trocarDeFase(String novaFase) {
+        switch (novaFase) {
+            case "faseDeGrupos":
+                TelaQuatroGrupos t = new TelaQuatroGrupos();
+                Bundle data = new Bundle();
+                data.putString("campKey", campKey);
+                t.setArguments(data);
+                openFragment(t);
+                break;
+            case "oitavas1":
+                partidas1 = partidaDAO.listarFase(partidasGeral, "oitavas");
+                lblAtual.setText(R.string.oitavas);
+                fase = "oitavas1";
+                break;
+            case "oitavas2":
+                partidas1 = partidaDAO.listarFase(partidasGeral, "oitavas");
+                lblAtual.setText(R.string.oitavas);
+                fase = "oitavas2";
+                break;
+            case "quartas":
+                partidas1 = partidaDAO.listarFase(partidasGeral, "quartas");
+                lblAtual.setText(R.string.Quartas);
+                fase = "quartas";
+                break;
+            case "semi":
+                partidas1 = partidaDAO.listarFase(partidasGeral, "semi");
+                lblAtual.setText(R.string.Semi);
+                fase = "semi";
+                break;
+            case "final":
+                partidas1 = partidaDAO.listarFase(partidasGeral, "final");
+                lblAtual.setText(R.string.Final);
+                fase = "final";
+                break;
+            case "premios":
+                TelaPremios premios = new TelaPremios();
+                Bundle dataPremios = new Bundle();
+                dataPremios.putString("campKey", campKey);
+                premios.setArguments(dataPremios);
+                openFragment(premios);
+        }
+        partidas.clear();
+        for (Partida partida : partidas1) {
+            partida = partidaDAO.configurar(times, partida);
+            partidas.add(partida);
+        }
+        if (partidas.size() == 4) {
+            lblMandantePartida1.setVisibility(View.VISIBLE);
+            lblVisitantePartida1.setVisibility(View.VISIBLE);
+            lblMandantePlacar1.setVisibility(View.VISIBLE);
+            lblVisitantePlacar1.setVisibility(View.VISIBLE);
+            lblMandantePenaltis1.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis1.setVisibility(View.VISIBLE);
+            lblX1.setVisibility(View.VISIBLE);
+            lblMandantePartida4.setVisibility(View.VISIBLE);
+            lblVisitantePartida4.setVisibility(View.VISIBLE);
+            lblMandantePlacar4.setVisibility(View.VISIBLE);
+            lblVisitantePlacar4.setVisibility(View.VISIBLE);
+            lblMandantePenaltis4.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis4.setVisibility(View.VISIBLE);
+            lblX4.setVisibility(View.VISIBLE);
+            lblMandantePartida2.setVisibility(View.VISIBLE);
+            lblVisitantePartida2.setVisibility(View.VISIBLE);
+            lblMandantePartida3.setVisibility(View.VISIBLE);
+            lblVisitantePartida3.setVisibility(View.VISIBLE);
+            lblMandantePlacar2.setVisibility(View.VISIBLE);
+            lblVisitantePlacar2.setVisibility(View.VISIBLE);
+            lblMandantePlacar3.setVisibility(View.VISIBLE);
+            lblVisitantePlacar3.setVisibility(View.VISIBLE);
+            lblMandantePenaltis2.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis2.setVisibility(View.VISIBLE);
+            lblMandantePenaltis3.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis3.setVisibility(View.VISIBLE);
+            lblX2.setVisibility(View.VISIBLE);
+            lblX3.setVisibility(View.VISIBLE);
+            if (partidas.get(0).isCadastrada()) {
+                lblMandantePartida1.setText(partidas.get(0).getNomeMandante());
+                lblVisitantePartida1.setText(partidas.get(0).getNomeVisitante());
+                lblMandantePlacar1.setText(String.valueOf(partidas.get(0).getPlacarMandante()));
+                lblVisitantePlacar1.setText(String.valueOf(partidas.get(0).getPlacarVisitante()));
+                if (partidas.get(0).getPenaltisMandante() != 0 && partidas.get(0).getPenaltisVisitante() != 0) {
+                    lblMandantePenaltis1.setText(String.valueOf(partidas.get(0).getPenaltisMandante()));
+                    lblVisitantePenaltis1.setText(String.valueOf(partidas.get(0).getPenaltisVisitante()));
+                } else {
+                    lblMandantePenaltis1.setText("");
+                    lblVisitantePenaltis1.setText("");
+                }
+            } else {
+                lblMandantePartida1.setText(partidas.get(0).getNomeMandante());
+                lblVisitantePartida1.setText(partidas.get(0).getNomeVisitante());
+                lblMandantePlacar1.setText("");
+                lblVisitantePlacar1.setText("");
+                lblMandantePenaltis1.setText("");
+                lblVisitantePenaltis1.setText("");
+            }
+            if (partidas.get(1).isCadastrada()) {
+                lblMandantePartida2.setText(partidas.get(1).getNomeMandante());
+                lblVisitantePartida2.setText(partidas.get(1).getNomeVisitante());
+                lblMandantePlacar2.setText(String.valueOf(partidas.get(1).getPlacarMandante()));
+                lblVisitantePlacar2.setText(String.valueOf(partidas.get(1).getPlacarVisitante()));
+                if (partidas.get(1).getPenaltisMandante() != 0 && partidas.get(1).getPenaltisVisitante() != 0) {
+                    lblMandantePenaltis2.setText(String.valueOf(partidas.get(1).getPenaltisMandante()));
+                    lblVisitantePenaltis2.setText(String.valueOf(partidas.get(1).getPenaltisVisitante()));
+                } else {
+                    lblMandantePenaltis2.setText("");
+                    lblVisitantePenaltis2.setText("");
+                }
+            } else {
+                lblMandantePartida2.setText(partidas.get(1).getNomeMandante());
+                lblVisitantePartida2.setText(partidas.get(1).getNomeVisitante());
+                lblMandantePlacar2.setText("");
+                lblVisitantePlacar2.setText("");
+                lblMandantePenaltis2.setText("");
+                lblVisitantePenaltis2.setText("");
+            }
+            if (partidas.get(2).isCadastrada()) {
+                lblMandantePartida3.setText(partidas.get(2).getNomeMandante());
+                lblVisitantePartida3.setText(partidas.get(2).getNomeVisitante());
+                lblMandantePlacar3.setText(String.valueOf(partidas.get(2).getPlacarMandante()));
+                lblVisitantePlacar3.setText(String.valueOf(partidas.get(2).getPlacarVisitante()));
+                if (partidas.get(2).getPenaltisMandante() != 0 && partidas.get(2).getPenaltisVisitante() != 0) {
+                    lblMandantePenaltis3.setText(String.valueOf(partidas.get(2).getPenaltisMandante()));
+                    lblVisitantePenaltis3.setText(String.valueOf(partidas.get(2).getPenaltisVisitante()));
+                } else {
+                    lblMandantePenaltis3.setText("");
+                    lblVisitantePenaltis3.setText("");
+                }
+            } else {
+                lblMandantePartida3.setText(partidas.get(2).getNomeMandante());
+                lblVisitantePartida3.setText(partidas.get(2).getNomeVisitante());
+                lblMandantePlacar3.setText("");
+                lblVisitantePlacar3.setText("");
+                lblMandantePenaltis3.setText("");
+                lblVisitantePenaltis3.setText("");
+            }
+            if (partidas.get(3).isCadastrada()) {
+                lblMandantePartida4.setText(partidas.get(3).getNomeMandante());
+                lblVisitantePartida4.setText(partidas.get(3).getNomeVisitante());
+                lblMandantePlacar4.setText(String.valueOf(partidas.get(3).getPlacarMandante()));
+                lblVisitantePlacar4.setText(String.valueOf(partidas.get(3).getPlacarVisitante()));
+                if (partidas.get(3).getPenaltisMandante() != 0 && partidas.get(3).getPenaltisVisitante() != 0) {
+                    lblMandantePenaltis4.setText(String.valueOf(partidas.get(3).getPenaltisMandante()));
+                    lblVisitantePenaltis4.setText(String.valueOf(partidas.get(3).getPenaltisVisitante()));
+                } else {
+                    lblMandantePenaltis4.setText("");
+                    lblVisitantePenaltis4.setText("");
+                }
+            } else {
+                lblMandantePartida4.setText(partidas.get(3).getNomeMandante());
+                lblVisitantePartida4.setText(partidas.get(3).getNomeVisitante());
+                lblMandantePlacar4.setText("");
+                lblVisitantePlacar4.setText("");
+                lblMandantePenaltis4.setText("");
+                lblVisitantePenaltis4.setText("");
+            }
+        } else if (partidas.size() == 2) {
+            if (partidas.get(0).isCadastrada()) {
+                lblMandantePartida2.setText(partidas.get(0).getNomeMandante());
+                lblVisitantePartida2.setText(partidas.get(0).getNomeVisitante());
+                lblMandantePlacar2.setText(String.valueOf(partidas.get(0).getPlacarMandante()));
+                lblVisitantePlacar2.setText(String.valueOf(partidas.get(0).getPlacarVisitante()));
+                if (partidas.get(0).getPenaltisMandante() != 0 && partidas.get(0).getPenaltisVisitante() != 0) {
+                    lblMandantePenaltis2.setText(String.valueOf(partidas.get(0).getPenaltisMandante()));
+                    lblVisitantePenaltis2.setText(String.valueOf(partidas.get(0).getPenaltisVisitante()));
+                } else {
+                    lblMandantePenaltis2.setText("");
+                    lblVisitantePenaltis2.setText("");
+                }
+            } else {
+                lblMandantePartida2.setText(partidas.get(0).getNomeMandante());
+                lblVisitantePartida2.setText(partidas.get(0).getNomeVisitante());
+                lblMandantePlacar2.setText("");
+                lblVisitantePlacar2.setText("");
+                lblMandantePenaltis2.setText("");
+                lblVisitantePenaltis2.setText("");
+            }
+            if (partidas.get(1).isCadastrada()) {
+                lblMandantePartida3.setText(partidas.get(1).getNomeMandante());
+                lblVisitantePartida3.setText(partidas.get(1).getNomeVisitante());
+                lblMandantePlacar3.setText(String.valueOf(partidas.get(1).getPlacarMandante()));
+                lblVisitantePlacar3.setText(String.valueOf(partidas.get(1).getPlacarVisitante()));
+                if (partidas.get(1).getPenaltisMandante() != 0 && partidas.get(1).getPenaltisVisitante() != 0) {
+                    lblMandantePenaltis3.setText(String.valueOf(partidas.get(1).getPenaltisMandante()));
+                    lblVisitantePenaltis3.setText(String.valueOf(partidas.get(1).getPenaltisVisitante()));
+                } else {
+                    lblMandantePenaltis3.setText("");
+                    lblVisitantePenaltis3.setText("");
+                }
+            } else {
+                lblMandantePartida3.setText(partidas.get(1).getNomeMandante());
+                lblVisitantePartida3.setText(partidas.get(1).getNomeVisitante());
+                lblMandantePlacar3.setText("");
+                lblVisitantePlacar3.setText("");
+                lblMandantePenaltis3.setText("");
+                lblVisitantePenaltis3.setText("");
+            }
+            lblMandantePartida1.setVisibility(View.INVISIBLE);
+            lblVisitantePartida1.setVisibility(View.INVISIBLE);
+            lblMandantePartida4.setVisibility(View.INVISIBLE);
+            lblVisitantePartida4.setVisibility(View.INVISIBLE);
+            lblMandantePlacar1.setVisibility(View.INVISIBLE);
+            lblVisitantePlacar1.setVisibility(View.INVISIBLE);
+            lblMandantePlacar4.setVisibility(View.INVISIBLE);
+            lblVisitantePlacar4.setVisibility(View.INVISIBLE);
+            lblMandantePenaltis1.setVisibility(View.INVISIBLE);
+            lblVisitantePenaltis1.setVisibility(View.INVISIBLE);
+            lblMandantePenaltis4.setVisibility(View.INVISIBLE);
+            lblVisitantePenaltis4.setVisibility(View.INVISIBLE);
+            lblX1.setVisibility(View.INVISIBLE);
+            lblX4.setVisibility(View.INVISIBLE);
+
+            lblMandantePartida3.setVisibility(View.VISIBLE);
+            lblVisitantePartida3.setVisibility(View.VISIBLE);
+            lblMandantePlacar3.setVisibility(View.VISIBLE);
+            lblVisitantePlacar3.setVisibility(View.VISIBLE);
+            lblMandantePenaltis3.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis3.setVisibility(View.VISIBLE);
+            lblX3.setVisibility(View.VISIBLE);
+            lblMandantePartida2.setVisibility(View.VISIBLE);
+            lblVisitantePartida2.setVisibility(View.VISIBLE);
+            lblMandantePlacar2.setVisibility(View.VISIBLE);
+            lblVisitantePlacar2.setVisibility(View.VISIBLE);
+            lblMandantePenaltis2.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis2.setVisibility(View.VISIBLE);
+            lblX2.setVisibility(View.VISIBLE);
+        } else if (partidas.size() == 6) {
+            if (fase.equals("oitavas1")) {
+                if (partidas.get(0).isCadastrada()) {
+                    lblMandantePartida1.setText(partidas.get(0).getNomeMandante());
+                    lblVisitantePartida1.setText(partidas.get(0).getNomeVisitante());
+                    lblMandantePlacar1.setText(String.valueOf(partidas.get(0).getPlacarMandante()));
+                    lblVisitantePlacar1.setText(String.valueOf(partidas.get(0).getPlacarVisitante()));
+                    if (partidas.get(0).getPenaltisMandante() != 0 && partidas.get(0).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis1.setText(String.valueOf(partidas.get(0).getPenaltisMandante()));
+                        lblVisitantePenaltis1.setText(String.valueOf(partidas.get(0).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis1.setText("");
+                        lblVisitantePenaltis1.setText("");
+                    }
+                } else {
+                    lblMandantePartida1.setText(partidas.get(0).getNomeMandante());
+                    lblVisitantePartida1.setText(partidas.get(0).getNomeVisitante());
+                    lblMandantePlacar1.setText("");
+                    lblVisitantePlacar1.setText("");
+                    lblMandantePenaltis1.setText("");
+                    lblVisitantePenaltis1.setText("");
+                }
+                if (partidas.get(1).isCadastrada()) {
+                    lblMandantePartida2.setText(partidas.get(1).getNomeMandante());
+                    lblVisitantePartida2.setText(partidas.get(1).getNomeVisitante());
+                    lblMandantePlacar2.setText(String.valueOf(partidas.get(1).getPlacarMandante()));
+                    lblVisitantePlacar2.setText(String.valueOf(partidas.get(1).getPlacarVisitante()));
+                    if (partidas.get(1).getPenaltisMandante() != 0 && partidas.get(1).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis2.setText(String.valueOf(partidas.get(1).getPenaltisMandante()));
+                        lblVisitantePenaltis2.setText(String.valueOf(partidas.get(1).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis2.setText("");
+                        lblVisitantePenaltis2.setText("");
+                    }
+                } else {
+                    lblMandantePartida2.setText(partidas.get(1).getNomeMandante());
+                    lblVisitantePartida2.setText(partidas.get(1).getNomeVisitante());
+                    lblMandantePlacar2.setText("");
+                    lblVisitantePlacar2.setText("");
+                    lblMandantePenaltis2.setText("");
+                    lblVisitantePenaltis2.setText("");
+                }
+                if (partidas.get(2).isCadastrada()) {
+                    lblMandantePartida3.setText(partidas.get(2).getNomeMandante());
+                    lblVisitantePartida3.setText(partidas.get(2).getNomeVisitante());
+                    lblMandantePlacar3.setText(String.valueOf(partidas.get(2).getPlacarMandante()));
+                    lblVisitantePlacar3.setText(String.valueOf(partidas.get(2).getPlacarVisitante()));
+                    if (partidas.get(2).getPenaltisMandante() != 0 && partidas.get(2).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis3.setText(String.valueOf(partidas.get(2).getPenaltisMandante()));
+                        lblVisitantePenaltis3.setText(String.valueOf(partidas.get(2).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis3.setText("");
+                        lblVisitantePenaltis3.setText("");
+                    }
+                } else {
+                    lblMandantePartida3.setText(partidas.get(2).getNomeMandante());
+                    lblVisitantePartida3.setText(partidas.get(2).getNomeVisitante());
+                    lblMandantePlacar3.setText("");
+                    lblVisitantePlacar3.setText("");
+                    lblMandantePenaltis3.setText("");
+                    lblVisitantePenaltis3.setText("");
+                }
+            } else if (fase.equals("oitavas2")) {
+                if (partidas.get(3).isCadastrada()) {
+                    lblMandantePartida1.setText(partidas.get(3).getNomeMandante());
+                    lblVisitantePartida1.setText(partidas.get(3).getNomeVisitante());
+                    lblMandantePlacar1.setText(String.valueOf(partidas.get(3).getPlacarMandante()));
+                    lblVisitantePlacar1.setText(String.valueOf(partidas.get(3).getPlacarVisitante()));
+                    if (partidas.get(3).getPenaltisMandante() != 0 && partidas.get(3).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis1.setText(String.valueOf(partidas.get(3).getPenaltisMandante()));
+                        lblVisitantePenaltis1.setText(String.valueOf(partidas.get(3).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis1.setText("");
+                        lblVisitantePenaltis1.setText("");
+                    }
+                } else {
+                    lblMandantePartida1.setText(partidas.get(3).getNomeMandante());
+                    lblVisitantePartida1.setText(partidas.get(3).getNomeVisitante());
+                    lblMandantePlacar1.setText("");
+                    lblVisitantePlacar1.setText("");
+                    lblMandantePenaltis1.setText("");
+                    lblVisitantePenaltis1.setText("");
+                }
+                if (partidas.get(4).isCadastrada()) {
+                    lblMandantePartida2.setText(partidas.get(4).getNomeMandante());
+                    lblVisitantePartida2.setText(partidas.get(4).getNomeVisitante());
+                    lblMandantePlacar2.setText(String.valueOf(partidas.get(4).getPlacarMandante()));
+                    lblVisitantePlacar2.setText(String.valueOf(partidas.get(4).getPlacarVisitante()));
+                    if (partidas.get(4).getPenaltisMandante() != 0 && partidas.get(4).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis2.setText(String.valueOf(partidas.get(4).getPenaltisMandante()));
+                        lblVisitantePenaltis2.setText(String.valueOf(partidas.get(4).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis2.setText("");
+                        lblVisitantePenaltis2.setText("");
+                    }
+                } else {
+                    lblMandantePartida2.setText(partidas.get(4).getNomeMandante());
+                    lblVisitantePartida2.setText(partidas.get(4).getNomeVisitante());
+                    lblMandantePlacar2.setText("");
+                    lblVisitantePlacar2.setText("");
+                    lblMandantePenaltis2.setText("");
+                    lblVisitantePenaltis2.setText("");
+                }
+                if (partidas.get(5).isCadastrada()) {
+                    lblMandantePartida3.setText(partidas.get(5).getNomeMandante());
+                    lblVisitantePartida3.setText(partidas.get(5).getNomeVisitante());
+                    lblMandantePlacar3.setText(String.valueOf(partidas.get(5).getPlacarMandante()));
+                    lblVisitantePlacar3.setText(String.valueOf(partidas.get(5).getPlacarVisitante()));
+                    if (partidas.get(5).getPenaltisMandante() != 0 && partidas.get(5).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis3.setText(String.valueOf(partidas.get(5).getPenaltisMandante()));
+                        lblVisitantePenaltis3.setText(String.valueOf(partidas.get(5).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis3.setText("");
+                        lblVisitantePenaltis3.setText("");
+                    }
+                } else {
+                    lblMandantePartida3.setText(partidas.get(5).getNomeMandante());
+                    lblVisitantePartida3.setText(partidas.get(5).getNomeVisitante());
+                    lblMandantePlacar3.setText("");
+                    lblVisitantePlacar3.setText("");
+                    lblMandantePenaltis3.setText("");
+                    lblVisitantePenaltis3.setText("");
+                }
+            }
+            lblMandantePartida4.setVisibility(View.INVISIBLE);
+            lblVisitantePartida4.setVisibility(View.INVISIBLE);
+            lblMandantePlacar4.setVisibility(View.INVISIBLE);
+            lblVisitantePlacar4.setVisibility(View.INVISIBLE);
+            lblMandantePenaltis4.setVisibility(View.INVISIBLE);
+            lblVisitantePenaltis4.setVisibility(View.INVISIBLE);
+            lblX4.setVisibility(View.INVISIBLE);
+            lblMandantePartida1.setVisibility(View.VISIBLE);
+            lblVisitantePartida1.setVisibility(View.VISIBLE);
+            lblMandantePlacar1.setVisibility(View.VISIBLE);
+            lblVisitantePlacar1.setVisibility(View.VISIBLE);
+            lblMandantePenaltis1.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis1.setVisibility(View.VISIBLE);
+            lblX1.setVisibility(View.VISIBLE);
+            lblMandantePartida2.setVisibility(View.VISIBLE);
+            lblVisitantePartida2.setVisibility(View.VISIBLE);
+            lblMandantePlacar2.setVisibility(View.VISIBLE);
+            lblVisitantePlacar2.setVisibility(View.VISIBLE);
+            lblMandantePenaltis2.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis2.setVisibility(View.VISIBLE);
+            lblX2.setVisibility(View.VISIBLE);
+            lblMandantePartida3.setVisibility(View.VISIBLE);
+            lblVisitantePartida3.setVisibility(View.VISIBLE);
+            lblMandantePlacar3.setVisibility(View.VISIBLE);
+            lblVisitantePlacar3.setVisibility(View.VISIBLE);
+            lblMandantePenaltis3.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis3.setVisibility(View.VISIBLE);
+            lblX3.setVisibility(View.VISIBLE);
+        } else if (partidas.size() == 8) {
+            lblMandantePartida1.setVisibility(View.VISIBLE);
+            lblVisitantePartida1.setVisibility(View.VISIBLE);
+            lblMandantePlacar1.setVisibility(View.VISIBLE);
+            lblVisitantePlacar1.setVisibility(View.VISIBLE);
+            lblMandantePenaltis1.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis1.setVisibility(View.VISIBLE);
+            lblX1.setVisibility(View.VISIBLE);
+            lblMandantePartida2.setVisibility(View.VISIBLE);
+            lblVisitantePartida2.setVisibility(View.VISIBLE);
+            lblMandantePlacar2.setVisibility(View.VISIBLE);
+            lblVisitantePlacar2.setVisibility(View.VISIBLE);
+            lblMandantePenaltis2.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis2.setVisibility(View.VISIBLE);
+            lblX2.setVisibility(View.VISIBLE);
+            lblMandantePartida3.setVisibility(View.VISIBLE);
+            lblVisitantePartida3.setVisibility(View.VISIBLE);
+            lblMandantePlacar3.setVisibility(View.VISIBLE);
+            lblVisitantePlacar3.setVisibility(View.VISIBLE);
+            lblMandantePenaltis3.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis3.setVisibility(View.VISIBLE);
+            lblX3.setVisibility(View.VISIBLE);
+            lblMandantePartida4.setVisibility(View.VISIBLE);
+            lblVisitantePartida4.setVisibility(View.VISIBLE);
+            lblMandantePlacar4.setVisibility(View.VISIBLE);
+            lblVisitantePlacar4.setVisibility(View.VISIBLE);
+            lblMandantePenaltis4.setVisibility(View.VISIBLE);
+            lblVisitantePenaltis4.setVisibility(View.VISIBLE);
+            lblX4.setVisibility(View.VISIBLE);
+            if (novaFase.equals("oitavas1")) {
+                if (partidas.get(0).isCadastrada()) {
+                    lblMandantePartida1.setText(partidas.get(0).getNomeMandante());
+                    lblVisitantePartida1.setText(partidas.get(0).getNomeVisitante());
+                    lblMandantePlacar1.setText(String.valueOf(partidas.get(0).getPlacarMandante()));
+                    lblVisitantePlacar1.setText(String.valueOf(partidas.get(0).getPlacarVisitante()));
+                    if (partidas.get(0).getPenaltisMandante() != 0 && partidas.get(0).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis1.setText(String.valueOf(partidas.get(0).getPenaltisMandante()));
+                        lblVisitantePenaltis1.setText(String.valueOf(partidas.get(0).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis1.setText("");
+                        lblVisitantePenaltis1.setText("");
+                    }
+                } else {
+                    lblMandantePartida1.setText(partidas.get(0).getNomeMandante());
+                    lblVisitantePartida1.setText(partidas.get(0).getNomeVisitante());
+                    lblMandantePlacar1.setText("");
+                    lblVisitantePlacar1.setText("");
+                    lblMandantePenaltis1.setText("");
+                    lblVisitantePenaltis1.setText("");
+                }
+                if (partidas.get(1).isCadastrada()) {
+                    lblMandantePartida2.setText(partidas.get(1).getNomeMandante());
+                    lblVisitantePartida2.setText(partidas.get(1).getNomeVisitante());
+                    lblMandantePlacar2.setText(String.valueOf(partidas.get(1).getPlacarMandante()));
+                    lblVisitantePlacar2.setText(String.valueOf(partidas.get(1).getPlacarVisitante()));
+                    if (partidas.get(1).getPenaltisMandante() != 0 && partidas.get(1).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis2.setText(String.valueOf(partidas.get(1).getPenaltisMandante()));
+                        lblVisitantePenaltis2.setText(String.valueOf(partidas.get(1).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis2.setText("");
+                        lblVisitantePenaltis2.setText("");
+                    }
+                } else {
+                    lblMandantePartida2.setText(partidas.get(1).getNomeMandante());
+                    lblVisitantePartida2.setText(partidas.get(1).getNomeVisitante());
+                    lblMandantePlacar2.setText("");
+                    lblVisitantePlacar2.setText("");
+                    lblMandantePenaltis2.setText("");
+                    lblVisitantePenaltis2.setText("");
+                }
+                if (partidas.get(2).isCadastrada()) {
+                    lblMandantePartida3.setText(partidas.get(2).getNomeMandante());
+                    lblVisitantePartida3.setText(partidas.get(2).getNomeVisitante());
+                    lblMandantePlacar3.setText(String.valueOf(partidas.get(2).getPlacarMandante()));
+                    lblVisitantePlacar3.setText(String.valueOf(partidas.get(2).getPlacarVisitante()));
+                    if (partidas.get(2).getPenaltisMandante() != 0 && partidas.get(2).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis3.setText(String.valueOf(partidas.get(2).getPenaltisMandante()));
+                        lblVisitantePenaltis3.setText(String.valueOf(partidas.get(2).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis3.setText("");
+                        lblVisitantePenaltis3.setText("");
+                    }
+                } else {
+                    lblMandantePartida3.setText(partidas.get(2).getNomeMandante());
+                    lblVisitantePartida3.setText(partidas.get(2).getNomeVisitante());
+                    lblMandantePlacar3.setText("");
+                    lblVisitantePlacar3.setText("");
+                    lblMandantePenaltis3.setText("");
+                    lblVisitantePenaltis3.setText("");
+                }
+                if (partidas.get(3).isCadastrada()) {
+                    lblMandantePartida4.setText(partidas.get(3).getNomeMandante());
+                    lblVisitantePartida4.setText(partidas.get(3).getNomeVisitante());
+                    lblMandantePlacar4.setText(String.valueOf(partidas.get(3).getPlacarMandante()));
+                    lblVisitantePlacar4.setText(String.valueOf(partidas.get(3).getPlacarVisitante()));
+                    if (partidas.get(3).getPenaltisMandante() != 0 && partidas.get(3).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis4.setText(String.valueOf(partidas.get(3).getPenaltisMandante()));
+                        lblVisitantePenaltis4.setText(String.valueOf(partidas.get(3).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis4.setText("");
+                        lblVisitantePenaltis4.setText("");
+                    }
+                } else {
+                    lblMandantePartida4.setText(partidas.get(3).getNomeMandante());
+                    lblVisitantePartida4.setText(partidas.get(3).getNomeVisitante());
+                    lblMandantePlacar4.setText("");
+                    lblVisitantePlacar4.setText("");
+                    lblMandantePenaltis4.setText("");
+                    lblVisitantePenaltis4.setText("");
+                }
+            } else if (novaFase.equals("oitavas2")) {
+
+                if (partidas.get(4).isCadastrada()) {
+                    lblMandantePartida1.setText(partidas.get(4).getNomeMandante());
+                    lblVisitantePartida1.setText(partidas.get(4).getNomeVisitante());
+                    lblMandantePlacar1.setText(String.valueOf(partidas.get(4).getPlacarMandante()));
+                    lblVisitantePlacar1.setText(String.valueOf(partidas.get(4).getPlacarVisitante()));
+                    if (partidas.get(4).getPenaltisMandante() != 0 && partidas.get(4).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis1.setText(String.valueOf(partidas.get(4).getPenaltisMandante()));
+                        lblVisitantePenaltis1.setText(String.valueOf(partidas.get(4).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis1.setText("");
+                        lblVisitantePenaltis1.setText("");
+                    }
+                } else {
+                    lblMandantePartida1.setText(partidas.get(4).getNomeMandante());
+                    lblVisitantePartida1.setText(partidas.get(4).getNomeVisitante());
+                    lblMandantePlacar1.setText("");
+                    lblVisitantePlacar1.setText("");
+                    lblMandantePenaltis1.setText("");
+                    lblVisitantePenaltis1.setText("");
+                }
+                if (partidas.get(5).isCadastrada()) {
+                    lblMandantePartida2.setText(partidas.get(5).getNomeMandante());
+                    lblVisitantePartida2.setText(partidas.get(5).getNomeVisitante());
+                    lblMandantePlacar2.setText(String.valueOf(partidas.get(5).getPlacarMandante()));
+                    lblVisitantePlacar2.setText(String.valueOf(partidas.get(5).getPlacarVisitante()));
+                    if (partidas.get(5).getPenaltisMandante() != 0 && partidas.get(5).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis2.setText(String.valueOf(partidas.get(5).getPenaltisMandante()));
+                        lblVisitantePenaltis2.setText(String.valueOf(partidas.get(5).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis2.setText("");
+                        lblVisitantePenaltis2.setText("");
+                    }
+                } else {
+                    lblMandantePartida2.setText(partidas.get(5).getNomeMandante());
+                    lblVisitantePartida2.setText(partidas.get(5).getNomeVisitante());
+                    lblMandantePlacar2.setText("");
+                    lblVisitantePlacar2.setText("");
+                    lblMandantePenaltis2.setText("");
+                    lblVisitantePenaltis2.setText("");
+                }
+                if (partidas.get(6).isCadastrada()) {
+                    lblMandantePartida3.setText(partidas.get(6).getNomeMandante());
+                    lblVisitantePartida3.setText(partidas.get(6).getNomeVisitante());
+                    lblMandantePlacar3.setText(String.valueOf(partidas.get(6).getPlacarMandante()));
+                    lblVisitantePlacar3.setText(String.valueOf(partidas.get(6).getPlacarVisitante()));
+                    if (partidas.get(6).getPenaltisMandante() != 0 && partidas.get(6).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis3.setText(String.valueOf(partidas.get(6).getPenaltisMandante()));
+                        lblVisitantePenaltis3.setText(String.valueOf(partidas.get(6).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis3.setText("");
+                        lblVisitantePenaltis3.setText("");
+                    }
+                } else {
+                    lblMandantePartida3.setText(partidas.get(6).getNomeMandante());
+                    lblVisitantePartida3.setText(partidas.get(6).getNomeVisitante());
+                    lblMandantePlacar3.setText("");
+                    lblVisitantePlacar3.setText("");
+                    lblMandantePenaltis3.setText("");
+                    lblVisitantePenaltis3.setText("");
+                }
+                if (partidas.get(7).isCadastrada()) {
+                    lblMandantePartida4.setText(partidas.get(7).getNomeMandante());
+                    lblVisitantePartida4.setText(partidas.get(7).getNomeVisitante());
+                    lblMandantePlacar4.setText(String.valueOf(partidas.get(7).getPlacarMandante()));
+                    lblVisitantePlacar4.setText(String.valueOf(partidas.get(7).getPlacarVisitante()));
+                    if (partidas.get(7).getPenaltisMandante() != 0 && partidas.get(7).getPenaltisVisitante() != 0) {
+                        lblMandantePenaltis4.setText(String.valueOf(partidas.get(7).getPenaltisMandante()));
+                        lblVisitantePenaltis4.setText(String.valueOf(partidas.get(7).getPenaltisVisitante()));
+                    } else {
+                        lblMandantePenaltis4.setText("");
+                        lblVisitantePenaltis4.setText("");
+                    }
+                } else {
+                    lblMandantePartida4.setText(partidas.get(7).getNomeMandante());
+                    lblVisitantePartida4.setText(partidas.get(7).getNomeVisitante());
+                    lblMandantePlacar4.setText("");
+                    lblVisitantePlacar4.setText("");
+                    lblMandantePenaltis4.setText("");
+                    lblVisitantePenaltis4.setText("");
+                }
+
+            }
+        } else if (partidas.size() == 1) {
+            lblMandantePartida4.setVisibility(View.INVISIBLE);
+            lblVisitantePartida4.setVisibility(View.INVISIBLE);
+            lblMandantePlacar4.setVisibility(View.INVISIBLE);
+            lblVisitantePlacar4.setVisibility(View.INVISIBLE);
+            lblMandantePenaltis4.setVisibility(View.INVISIBLE);
+            lblVisitantePenaltis4.setVisibility(View.INVISIBLE);
+            lblX4.setVisibility(View.INVISIBLE);
+            lblMandantePartida3.setVisibility(View.INVISIBLE);
+            lblVisitantePartida3.setVisibility(View.INVISIBLE);
+            lblMandantePlacar3.setVisibility(View.INVISIBLE);
+            lblVisitantePlacar3.setVisibility(View.INVISIBLE);
+            lblMandantePenaltis3.setVisibility(View.INVISIBLE);
+            lblVisitantePenaltis3.setVisibility(View.INVISIBLE);
+            lblX3.setVisibility(View.INVISIBLE);
+            lblMandantePartida1.setVisibility(View.INVISIBLE);
+            lblVisitantePartida1.setVisibility(View.INVISIBLE);
+            lblMandantePlacar1.setVisibility(View.INVISIBLE);
+            lblVisitantePlacar1.setVisibility(View.INVISIBLE);
+            lblMandantePenaltis1.setVisibility(View.INVISIBLE);
+            lblVisitantePenaltis1.setVisibility(View.INVISIBLE);
+            lblX1.setVisibility(View.INVISIBLE);
+            if (partidas.get(0).isCadastrada()) {
+                lblMandantePartida2.setText(partidas.get(0).getNomeMandante());
+                lblVisitantePartida2.setText(partidas.get(0).getNomeVisitante());
+                lblMandantePlacar2.setText(String.valueOf(partidas.get(0).getPlacarMandante()));
+                lblVisitantePlacar2.setText(String.valueOf(partidas.get(0).getPlacarVisitante()));
+                if (partidas.get(0).getPenaltisMandante() != 0 && partidas.get(0).getPenaltisVisitante() != 0) {
+                    lblMandantePenaltis2.setText(String.valueOf(partidas.get(0).getPenaltisMandante()));
+                    lblVisitantePenaltis2.setText(String.valueOf(partidas.get(0).getPenaltisVisitante()));
+                } else {
+                    lblMandantePenaltis2.setText("");
+                    lblVisitantePenaltis2.setText("");
+                }
+            } else {
+                lblMandantePartida2.setText(partidas.get(0).getNomeMandante());
+                lblVisitantePartida2.setText(partidas.get(0).getNomeVisitante());
+                lblMandantePlacar2.setText("");
+                lblVisitantePlacar2.setText("");
+                lblMandantePenaltis2.setText("");
+                lblVisitantePenaltis2.setText("");
+            }
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (partidaListener != null) {
-            partidaReference.removeEventListener(partidaListener);
-        }
         if (campListener != null) {
             campReference.removeEventListener(campListener);
         }
@@ -422,188 +899,11 @@ public class TelaOitavas extends AppCompatActivity {
         if (campListener3 != null) {
             campReference.removeEventListener(campListener3);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        ValueEventListener mCampListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Campeonato camp = dataSnapshot.getValue(Campeonato.class);
-                if (!camp.isOitavas()) {
-                    if (camp.getNumGrupos() > 0) {
-                        getMenuInflater().inflate(R.menu.ftc_menu_fases, menu);
-                    }else{
-                        getMenuInflater().inflate(R.menu.ftc_menu_prox2,menu);
-                    }
-                } else {
-                    if (camp.getNumGrupos() > 0) {
-                        getMenuInflater().inflate(R.menu.ftc_menu_ant, menu);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        campReference.addListenerForSingleValueEvent(mCampListener);
-        campListener2 = mCampListener;
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                ValueEventListener mCampListener = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Campeonato camp = dataSnapshot.getValue(Campeonato.class);
-                        if (camp.isFinalizado()) {
-                            Intent it = new Intent(TelaOitavas.this, TelaPremios.class);
-                            it.putExtra("user", user);
-                            it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
-                        } else {
-                            criarActivity();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                };
-                campReference.addListenerForSingleValueEvent(mCampListener);
-                campListener3 = mCampListener;
-                break;
-            case R.id.btn_prox:
-                Intent it = new Intent(TelaOitavas.this, TelaQuartas.class);
-                it.putExtra("user", user);
-                it.putExtra("campKey", campKey);
-                startActivity(it);
-                finish();
-                break;
-            case R.id.btn_ant:
-                Intent ite = new Intent(TelaOitavas.this, TelaQuatroGrupos.class);
-                ite.putExtra("user", user);
-                ite.putExtra("campKey", campKey);
-                startActivity(ite);
-                finish();
-                break;
+        if (campListener4 != null) {
+            campReference.removeEventListener(campListener4);
         }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        ValueEventListener mCampListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Campeonato camp = dataSnapshot.getValue(Campeonato.class);
-                if (camp.isFinalizado()) {
-                    Intent it = new Intent(TelaOitavas.this, TelaPremios.class);
-                    it.putExtra("user", user);
-                    it.putExtra("campKey", campKey);
-                    startActivity(it);
-                    finish();
-                } else {
-                    criarActivity();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        campReference.addListenerForSingleValueEvent(mCampListener);
-        campListener3 = mCampListener;
-    }
-
-    private void criarActivity() {
-        Intent it = new Intent(TelaOitavas.this, TelaCarregarCamp.class);
-        it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        it.putExtra("user", user);
-        startActivity(it);
-        finish();
-    }
-
-    private void createDrawer() {
-        //Itens do Drawer
-        headerNavigation = new AccountHeaderBuilder()
-                .withActivity(this)
-                .withProfileImagesVisible(false)
-                .withHeaderBackground(R.color.colorPrimaryDark)
-                .addProfiles(new ProfileDrawerItem().withName(user.getDisplayName()).withEmail(user.getEmail()))
-
-                .build();
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.ftc_jogos).withIcon(R.drawable.soccer_ball_32px);
-        PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(R.string.ftc_artilheiros).withIcon(R.drawable.soccer_32px);
-        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName(R.string.ftc_suspensos).withIcon(R.drawable.soccer_card_32px);
-        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName(R.string.ftc_pendurados).withIcon(R.drawable.soccer_card_32px);
-
-        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName(R.string.ftc_voltar).withIcon(R.drawable.back_32px);
-        //Definição do Drawer
-        Drawer drawer = new DrawerBuilder()
-                .withActivity(this)
-                .withSliderBackgroundDrawableRes(R.drawable.gradient)
-                .withToolbar(toolbar)
-                .withAccountHeader(headerNavigation)
-                .addDrawerItems(
-
-                        item1,
-                        new DividerDrawerItem(),//Divisor
-                        item2,
-                        new DividerDrawerItem(),
-                        item3,
-                        new DividerDrawerItem(),
-                        item4,
-                        new DividerDrawerItem(),
-                        item5
-
-                )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (drawerItem.getIdentifier() == 1) {
-                            Intent it = new Intent(TelaOitavas.this, TelaJogos.class);
-                            it.putExtra("user", user);
-                            it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
-                        } else if (drawerItem.getIdentifier() == 2) {
-                            Intent it = new Intent(TelaOitavas.this, TelaArtilheiros.class);
-                            it.putExtra("user", user);
-                            it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
-                        } else if (drawerItem.getIdentifier() == 3) {
-                            Intent it = new Intent(TelaOitavas.this, TelaSuspensos.class);
-                            it.putExtra("user", user);
-                            it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
-                        } else if (drawerItem.getIdentifier() == 4) {
-                            Intent it = new Intent(TelaOitavas.this, TelaPendurados.class);
-                            it.putExtra("user", user);
-                            it.putExtra("campKey", campKey);
-                            startActivity(it);
-                            finish();
-                        } else if (drawerItem.getIdentifier() == 5) {
-                            criarActivity();
-                        }
-                        return false;
-                    }
-                })
-                .withSelectedItemByPosition(-1)
-                .build();
-        drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        drawer.getActionBarDrawerToggle().setHomeAsUpIndicator(R.drawable.menu_32px);
+        if (campListener5 != null) {
+            campReference.removeEventListener(campListener5);
+        }
     }
 }

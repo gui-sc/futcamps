@@ -1,23 +1,25 @@
 package com.example.ehComplicado;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.ehComplicado.FirebaseHelper.JogadorHelper;
 import com.example.ehComplicado.FirebaseHelper.TimeHelper;
 import com.example.ehComplicado.FirebaseHelper.UsuarioHelper;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,40 +43,38 @@ import model.dao.PartidaDAO;
 import model.dao.ResultadosDAO;
 import model.dao.TimeDAO;
 
-public class TelaVermelhos extends AppCompatActivity {
-    FirebaseUser user;
-    String campKey;
-    DatabaseReference timeReference, partidaReference, jogadorReference, campReference;
-    TimeHelper timeHelper;
-    List<Usuario> usuarios;
-    CampeonatoDAO campDAO;
-    UsuarioHelper usuarioHelper;
-    JogadorHelper jogadorHelperTime1, jogadorHelperTime2, jogadorHelper;
+public class TelaVermelhos extends Fragment {
+    private FirebaseUser user;
+    private String campKey;
+    private DatabaseReference partidaReference;
+    private DatabaseReference campReference;
+    private List<Usuario> usuarios;
+    private CampeonatoDAO campDAO;
     private JogadorDAO jogadorDAO;
     private CVermelhoDAO vermelhoDAO;
-    List<Time> times;
-    ValueEventListener partidaListener,campListener2;
+    private List<Time> times;
+    private ValueEventListener partidaListener, campListener2;
     private Partida partida;
     private ListView lstCv;
-    Campeonato camp, campNome;
-    TimeDAO timeDAO;
-    Resultados resultados;
-    ResultadosDAO resultadosDAO;
-    PartidaDAO partidaDAO;
-    List<Jogador> jogadores1;
+    private Campeonato camp, campNome;
+    private TimeDAO timeDAO;
+    private Resultados resultados;
+    private ResultadosDAO resultadosDAO;
+    private PartidaDAO partidaDAO;
+    private List<Jogador> jogadores1;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_tela_vermelhos, container, false);
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tela_vermelhos);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle(R.string.vermelhos);
-        lstCv = findViewById(R.id.ftc_lista_cv);
-        final ListView lstJogadoresCvMandante = findViewById(R.id.ftc_lista__jogadores_cv_mandante);
-        final ListView lstJogadoresCvVisitante = findViewById(R.id.ftc_lista__jogadores_cv_visitante);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        lstCv = view.findViewById(R.id.ftc_lista_cv);
+        final ListView lstJogadoresCvMandante = view.findViewById(R.id.ftc_lista__jogadores_cv_mandante);
+        final ListView lstJogadoresCvVisitante = view.findViewById(R.id.ftc_lista__jogadores_cv_visitante);
         jogadorDAO = new JogadorDAO();
         vermelhoDAO = new CVermelhoDAO();
         timeDAO = new TimeDAO();
@@ -84,31 +84,30 @@ public class TelaVermelhos extends AppCompatActivity {
         resultadosDAO = new ResultadosDAO();
         partidaDAO = new PartidaDAO();
         campDAO = new CampeonatoDAO();
-        final PartidaDAO partidaDAO = new PartidaDAO();
-        user = getIntent().getParcelableExtra("user");
-        campKey = getIntent().getStringExtra("campKey");
-        partida = getIntent().getParcelableExtra("partida");
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        campKey = getArguments().getString("campKey");
+        partida = getArguments().getParcelable("partida");
         partidaReference = FirebaseDatabase.getInstance().getReference()
                 .child("partidas").child(partida.getId());
         campReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonatos").child(campKey);
-        timeReference = FirebaseDatabase.getInstance().getReference()
+        DatabaseReference timeReference = FirebaseDatabase.getInstance().getReference()
                 .child("campeonato-times").child(campKey);
-        timeHelper = new TimeHelper(timeReference);
+        TimeHelper timeHelper = new TimeHelper(timeReference);
         times = timeHelper.retrive();
-        jogadorReference = FirebaseDatabase.getInstance().getReference()
+        DatabaseReference jogadorReference = FirebaseDatabase.getInstance().getReference()
                 .child("time-jogadores").child(partida.getIdMandante());
-        jogadorHelperTime1 = new JogadorHelper(jogadorReference);
+        JogadorHelper jogadorHelperTime1 = new JogadorHelper(jogadorReference);
         jogadorReference = FirebaseDatabase.getInstance().getReference()
                 .child("time-jogadores").child(partida.getIdVisitante());
-        jogadorHelperTime2 = new JogadorHelper(jogadorReference);
+        JogadorHelper jogadorHelperTime2 = new JogadorHelper(jogadorReference);
         List<Jogador> primeiraLista1 = jogadorHelperTime1.retrive();
         List<Jogador> primeiraLista2 = jogadorHelperTime2.retrive();
-        final TextView lblMandante = findViewById(R.id.lbl_mandante);
-        final TextView lblVisitante = findViewById(R.id.lbl_visitante);
-        final ArrayAdapter<Jogador> cv = new ArrayAdapter<>(this, R.layout.personalizado_list_item);
-        final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(this, R.layout.personalizado_list_item, primeiraLista1);
-        final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(this, R.layout.personalizado_list_item, primeiraLista2);
+        final TextView lblMandante = view.findViewById(R.id.lbl_mandante);
+        final TextView lblVisitante = view.findViewById(R.id.lbl_visitante);
+        final ArrayAdapter<Jogador> cv = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item);
+        final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, primeiraLista1);
+        final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, primeiraLista2);
 
         ValueEventListener mPartidaListener = new ValueEventListener() {
             @Override
@@ -152,38 +151,16 @@ public class TelaVermelhos extends AppCompatActivity {
         });
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference()
                 .child("campeonato-seguidores").child(campKey);
-        usuarioHelper = new UsuarioHelper(userRef);
+        UsuarioHelper usuarioHelper = new UsuarioHelper(userRef);
         usuarios = usuarioHelper.retrive();
         DatabaseReference jogadorRef = FirebaseDatabase.getInstance().getReference()
                 .child("campeonato-jogadores").child(campKey);
-        jogadorHelper = new JogadorHelper(jogadorRef);
+        JogadorHelper jogadorHelper = new JogadorHelper(jogadorRef);
         jogadores1 = jogadorHelper.retrive();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (partidaListener != null) {
-            partidaReference.removeEventListener(partidaListener);
-        }
-        if(campListener2 != null){
-            campReference.removeEventListener(campListener2);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.ftc_menu_salvar, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                AlertDialog dlg = new AlertDialog.Builder(this).setTitle(R.string.ftc_acao_inexperada).setMessage(R.string.ftc_aviso_acao_inexperada)
-                        .setNeutralButton(R.string.ftc_ok, null).show();
-            case R.id.btn_salvar:
+        Button btnSalvar = view.findViewById(R.id.salvar_button);
+        btnSalvar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 for (int i = 0; i < lstCv.getCount(); i++) {
                     CVermelho vermelho = new CVermelho();
                     Jogador jogador = (Jogador) lstCv.getItemAtPosition(i);
@@ -202,13 +179,6 @@ public class TelaVermelhos extends AppCompatActivity {
                         partida.setCampeonato(camp);
                         if (partida.getPenaltisMandante() > partida.getPenaltisVisitante()) {
                             if (partida.getCampeonato().isFinal()) {
-                                partida.getMandante().setPontos(partida.getMandante().getPontos() + 3);
-                                partida.getMandante().setGolsPro(partida.getMandante().getGolsPro() + partida.getPlacarMandante());
-                                partida.getVisitante().setGolsPro(partida.getVisitante().getGolsPro() + partida.getPlacarVisitante());
-                                partida.getMandante().setGolsContra(partida.getMandante().getGolsContra() + partida.getPlacarVisitante());
-                                partida.getVisitante().setGolsContra(partida.getVisitante().getGolsContra() + partida.getPlacarMandante());
-                                partida.getMandante().setSaldo(partida.getMandante().getGolsPro() - partida.getMandante().getGolsContra());
-                                partida.getVisitante().setSaldo(partida.getVisitante().getGolsPro() - partida.getVisitante().getGolsContra());
                                 timeDAO.novaPartida(partida.getMandante(), campKey);
                                 timeDAO.novaPartida(partida.getVisitante(), campKey);
                                 resultados.setCampeao(partida.getMandante().getNome());
@@ -220,13 +190,6 @@ public class TelaVermelhos extends AppCompatActivity {
                                 partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                                 campDAO.finalizar(partida.getCampeonato(), usuarios, campNome.getNome());
                             } else {
-                                partida.getMandante().setPontos(partida.getMandante().getPontos() + 3);
-                                partida.getMandante().setGolsPro(partida.getMandante().getGolsPro() + partida.getPlacarMandante());
-                                partida.getVisitante().setGolsPro(partida.getVisitante().getGolsPro() + partida.getPlacarVisitante());
-                                partida.getMandante().setGolsContra(partida.getMandante().getGolsContra() + partida.getPlacarVisitante());
-                                partida.getVisitante().setGolsContra(partida.getVisitante().getGolsContra() + partida.getPlacarMandante());
-                                partida.getMandante().setSaldo(partida.getMandante().getGolsPro() - partida.getMandante().getGolsContra());
-                                partida.getVisitante().setSaldo(partida.getVisitante().getGolsPro() - partida.getVisitante().getGolsContra());
                                 timeDAO.novaPartida(partida.getMandante(), campKey);
                                 timeDAO.novaPartida(partida.getVisitante(), campKey);
                                 timeDAO.eliminar(partida.getVisitante(), campKey);
@@ -235,13 +198,6 @@ public class TelaVermelhos extends AppCompatActivity {
                             }
                         } else if (partida.getPenaltisVisitante() > partida.getPenaltisMandante()) {
                             if (partida.getCampeonato().isFinal()) {
-                                partida.getMandante().setPontos(partida.getMandante().getPontos() + 3);
-                                partida.getMandante().setGolsPro(partida.getMandante().getGolsPro() + partida.getPlacarMandante());
-                                partida.getVisitante().setGolsPro(partida.getVisitante().getGolsPro() + partida.getPlacarVisitante());
-                                partida.getMandante().setGolsContra(partida.getMandante().getGolsContra() + partida.getPlacarVisitante());
-                                partida.getVisitante().setGolsContra(partida.getVisitante().getGolsContra() + partida.getPlacarMandante());
-                                partida.getMandante().setSaldo(partida.getMandante().getGolsPro() - partida.getMandante().getGolsContra());
-                                partida.getVisitante().setSaldo(partida.getVisitante().getGolsPro() - partida.getVisitante().getGolsContra());
                                 timeDAO.novaPartida(partida.getMandante(), campKey);
                                 timeDAO.novaPartida(partida.getVisitante(), campKey);
                                 resultados.setCampeao(partida.getVisitante().getNome());
@@ -253,13 +209,6 @@ public class TelaVermelhos extends AppCompatActivity {
                                 partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                                 campDAO.finalizar(partida.getCampeonato(), usuarios, campNome.getNome());
                             } else {
-                                partida.getMandante().setPontos(partida.getMandante().getPontos() + 3);
-                                partida.getMandante().setGolsPro(partida.getMandante().getGolsPro() + partida.getPlacarMandante());
-                                partida.getVisitante().setGolsPro(partida.getVisitante().getGolsPro() + partida.getPlacarVisitante());
-                                partida.getMandante().setGolsContra(partida.getMandante().getGolsContra() + partida.getPlacarVisitante());
-                                partida.getVisitante().setGolsContra(partida.getVisitante().getGolsContra() + partida.getPlacarMandante());
-                                partida.getMandante().setSaldo(partida.getMandante().getGolsPro() - partida.getMandante().getGolsContra());
-                                partida.getVisitante().setSaldo(partida.getVisitante().getGolsPro() - partida.getVisitante().getGolsContra());
                                 timeDAO.novaPartida(partida.getMandante(), campKey);
                                 timeDAO.novaPartida(partida.getVisitante(), campKey);
                                 timeDAO.eliminar(partida.getMandante(), campKey);
@@ -280,13 +229,6 @@ public class TelaVermelhos extends AppCompatActivity {
                                 partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                             } else {
                                 if (partida.getCampeonato().isFinal()) {
-                                    partida.getMandante().setPontos(partida.getMandante().getPontos() + 3);
-                                    partida.getMandante().setGolsPro(partida.getMandante().getGolsPro() + partida.getPlacarMandante());
-                                    partida.getVisitante().setGolsPro(partida.getVisitante().getGolsPro() + partida.getPlacarVisitante());
-                                    partida.getMandante().setGolsContra(partida.getMandante().getGolsContra() + partida.getPlacarVisitante());
-                                    partida.getVisitante().setGolsContra(partida.getVisitante().getGolsContra() + partida.getPlacarMandante());
-                                    partida.getMandante().setSaldo(partida.getMandante().getGolsPro() - partida.getMandante().getGolsContra());
-                                    partida.getVisitante().setSaldo(partida.getVisitante().getGolsPro() - partida.getVisitante().getGolsContra());
                                     timeDAO.novaPartida(partida.getMandante(), campKey);
                                     timeDAO.novaPartida(partida.getVisitante(), campKey);
                                     resultados.setCampeao(partida.getMandante().getNome());
@@ -298,13 +240,6 @@ public class TelaVermelhos extends AppCompatActivity {
                                     partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                                     campDAO.finalizar(partida.getCampeonato(), usuarios, campNome.getNome());
                                 } else {
-                                    partida.getMandante().setPontos(partida.getMandante().getPontos() + 3);
-                                    partida.getMandante().setGolsPro(partida.getMandante().getGolsPro() + partida.getPlacarMandante());
-                                    partida.getVisitante().setGolsPro(partida.getVisitante().getGolsPro() + partida.getPlacarVisitante());
-                                    partida.getMandante().setGolsContra(partida.getMandante().getGolsContra() + partida.getPlacarVisitante());
-                                    partida.getVisitante().setGolsContra(partida.getVisitante().getGolsContra() + partida.getPlacarMandante());
-                                    partida.getMandante().setSaldo(partida.getMandante().getGolsPro() - partida.getMandante().getGolsContra());
-                                    partida.getVisitante().setSaldo(partida.getVisitante().getGolsPro() - partida.getVisitante().getGolsContra());
                                     timeDAO.novaPartida(partida.getMandante(), campKey);
                                     timeDAO.novaPartida(partida.getVisitante(), campKey);
                                     timeDAO.eliminar(partida.getVisitante(), campKey);
@@ -325,13 +260,6 @@ public class TelaVermelhos extends AppCompatActivity {
                                 partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                             } else {
                                 if (partida.getCampeonato().isFinal()) {
-                                    partida.getMandante().setPontos(partida.getMandante().getPontos() + 3);
-                                    partida.getMandante().setGolsPro(partida.getMandante().getGolsPro() + partida.getPlacarMandante());
-                                    partida.getVisitante().setGolsPro(partida.getVisitante().getGolsPro() + partida.getPlacarVisitante());
-                                    partida.getMandante().setGolsContra(partida.getMandante().getGolsContra() + partida.getPlacarVisitante());
-                                    partida.getVisitante().setGolsContra(partida.getVisitante().getGolsContra() + partida.getPlacarMandante());
-                                    partida.getMandante().setSaldo(partida.getMandante().getGolsPro() - partida.getMandante().getGolsContra());
-                                    partida.getVisitante().setSaldo(partida.getVisitante().getGolsPro() - partida.getVisitante().getGolsContra());
                                     timeDAO.novaPartida(partida.getMandante(), campKey);
                                     timeDAO.novaPartida(partida.getVisitante(), campKey);
                                     resultados.setCampeao(partida.getVisitante().getNome());
@@ -343,13 +271,6 @@ public class TelaVermelhos extends AppCompatActivity {
                                     partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                                     campDAO.finalizar(partida.getCampeonato(), usuarios, campNome.getNome());
                                 } else {
-                                    partida.getMandante().setPontos(partida.getMandante().getPontos() + 3);
-                                    partida.getMandante().setGolsPro(partida.getMandante().getGolsPro() + partida.getPlacarMandante());
-                                    partida.getVisitante().setGolsPro(partida.getVisitante().getGolsPro() + partida.getPlacarVisitante());
-                                    partida.getMandante().setGolsContra(partida.getMandante().getGolsContra() + partida.getPlacarVisitante());
-                                    partida.getVisitante().setGolsContra(partida.getVisitante().getGolsContra() + partida.getPlacarMandante());
-                                    partida.getMandante().setSaldo(partida.getMandante().getGolsPro() - partida.getMandante().getGolsContra());
-                                    partida.getVisitante().setSaldo(partida.getVisitante().getGolsPro() - partida.getVisitante().getGolsContra());
                                     timeDAO.novaPartida(partida.getMandante(), campKey);
                                     timeDAO.novaPartida(partida.getVisitante(), campKey);
                                     timeDAO.eliminar(partida.getMandante(), campKey);
@@ -371,8 +292,12 @@ public class TelaVermelhos extends AppCompatActivity {
                                 partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                             }
                         }
-
-
+                        TelaJogos t = new TelaJogos();
+                        Bundle data = new Bundle();
+                        data.putString("campKey", campKey);
+                        data.putParcelable("partida", partida);
+                        t.setArguments(data);
+                        openFragment(t);
                     }
 
                     @Override
@@ -382,12 +307,28 @@ public class TelaVermelhos extends AppCompatActivity {
                 };
                 campReference.addListenerForSingleValueEvent(mCampListener);
                 campListener2 = mCampListener;
-                Intent it = new Intent(TelaVermelhos.this, TelaJogos.class);
-                it.putExtra("user", user);
-                it.putExtra("campKey", campKey);
-                startActivity(it);
-                finish();
+
+
+            }
+        });
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (partidaListener != null) {
+            partidaReference.removeEventListener(partidaListener);
         }
-        return super.onOptionsItemSelected(item);
+        if (campListener2 != null) {
+            campReference.removeEventListener(campListener2);
+        }
+    }
+
+    public void openFragment(Fragment fragment) {
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fundoestadio2"
+    android:background="@drawable/fundoestadio"
     tools:context=".TelaEditarTime">
 
     <LinearLayout
@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
             android:background="@color/colorPrimary"
-            />
+            app:title="@string/ftc_editar_time" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/nome_text_input"
@@ -87,29 +87,36 @@
 
         <Switch
             android:id="@+id/sw_cabecaDeChave"
-            android:layout_marginStart="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:layout_marginBottom="10dp"
-            android:text="@string/ftc_cabeca_de_chave"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:layout_marginStart="20dp"
-            android:text="@string/jogadores"
-            android:textColor="@android:color/white"
+            android:layout_marginBottom="10dp"
+            android:text="@string/ftc_cabeca_de_chave"
             android:textSize="18sp" />
 
-            <ListView
-                android:id="@+id/lst_jogadores"
-                android:layout_width="match_parent"
-                android:paddingTop="1dp"
-                android:layout_height="100dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                tools:ignore="NestedScrolling" />
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btn_apagar"
+                style="@style/Widget.Futcamps.Button.DeleteButton"
+                android:layout_margin = "5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ftc_apagar_time"
+                android:textSize="18sp"
+                android:layout_alignParentEnd="true"/>
+
+            <Button
+                android:id="@+id/btn_salvar"
+                android:layout_margin="5dp"
+                style="@style/Widget.Futcamps.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ftc_salvar"
+                android:textSize="18sp" />
+        </RelativeLayout>
 
     </LinearLayout>
 

@@ -1,9 +1,11 @@
 package com.example.ehComplicado;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,46 +29,39 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.mikepenz.materialdrawer.AccountHeader;
-import com.mikepenz.materialdrawer.AccountHeaderBuilder;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import java.util.List;
 import model.bean.Campeonato;
 import model.bean.Usuario;
 
-public class TelaSeguindo extends AppCompatActivity {
-    AccountHeader headerNavigation;
-    DatabaseReference campReference;
-    FirebaseUser user;
-    Toolbar toolbar;
-    Campeonato camp;
-    FirebaseDatabase db;
-    CampeonatosAdapter2 adapter;
-    ValueEventListener campListener;
-    List<Campeonato> list;
-    ListView lv;
-    CampeonatoHelper helperSegue;
+public class TelaSeguindo extends Fragment {
+    private DatabaseReference campReference;
+    private FirebaseUser user;
+    private Campeonato camp;
+    private CampeonatosAdapter2 adapter;
+    private ValueEventListener campListener;
+    private List<Campeonato> list;
+    private ListView lv;
+
+    public static TelaSeguindo newInstance(){
+        return new TelaSeguindo();
+    }
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tela_seguindo);
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.ftc_seguindo);
-        db = FirebaseDatabase.getInstance();
-        lv = findViewById(R.id.lst_camp);
-        user = getIntent().getParcelableExtra("user");
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_tela_seguindo,container,false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        lv = view.findViewById(R.id.lst_camp);
+        user = FirebaseAuth.getInstance().getCurrentUser();
         campReference = FirebaseDatabase.getInstance().getReference()
                 .child("user-segue").child(user.getUid());
         ValueEventListener mCampListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                adapter = new CampeonatosAdapter2(TelaSeguindo.this,list,true,user.getUid());
+                adapter = new CampeonatosAdapter2(getContext(),list,true,user.getUid());
                 lv.setAdapter(adapter);
             }
 
@@ -77,57 +72,39 @@ public class TelaSeguindo extends AppCompatActivity {
         };
         campReference.addListenerForSingleValueEvent(mCampListener);
         campListener = mCampListener;
-        helperSegue = new CampeonatoHelper(campReference);
+        CampeonatoHelper helperSegue = new CampeonatoHelper(campReference);
         list= helperSegue.retrive();
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 camp = list.get(position);
+                Bundle data = new Bundle();
+                data.putString("campKey", camp.getId());
                 if (camp.isFaseDeGrupos()){
-                    Intent it = new Intent(TelaSeguindo.this,TelaQuatroGrupos.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",camp.getId());
-                    startActivity(it);
-                    finish();
-                }else if(camp.isOitavas()){
-                    Intent it = new Intent(TelaSeguindo.this,TelaOitavas.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",camp.getId());
-                    startActivity(it);
-                    finish();
-                }else if(camp.isQuartas()){
-                    Intent it = new Intent(TelaSeguindo.this,TelaQuartas.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",camp.getId());
-                    startActivity(it);
-                    finish();
-                }else if(camp.isSemi()){
-                    Intent it = new Intent(TelaSeguindo.this,TelaSemi.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",camp.getId());
-                    startActivity(it);
-                    finish();
-                }else if(camp.isFinal()){
-                    Intent it = new Intent(TelaSeguindo.this,TelaFinal.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",camp.getId());
-                    startActivity(it);
-                    finish();
+                    TelaQuatroGrupos quatroGrupos = new TelaQuatroGrupos();
+                    quatroGrupos.setArguments(data);
+                    openFragment(quatroGrupos);
+                }else if (camp.isOitavas() || camp.isQuartas() || camp.isSemi() || camp.isFinal()) {
+                    TelaOitavas t = new TelaOitavas();
+                    t.setArguments(data);
+                    openFragment(t);
                 }else if(camp.isFinalizado()){
-                    Intent it = new Intent(TelaSeguindo.this,TelaPremios.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",camp.getId());
-                    startActivity(it);
-                    finish();
+                    TelaPremios premios = new TelaPremios();
+                    premios.setArguments(data);
+                    openFragment(premios);
                 }else{
-                    Toast.makeText(TelaSeguindo.this, R.string.avisoCampeonato, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.avisoCampeonato, Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        createDrawer();
     }
-
+    public void openFragment(Fragment fragment) {
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
     @Override
     public void onStop(){
         super.onStop();
@@ -145,89 +122,20 @@ public class TelaSeguindo extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    @Override
-    public void onBackPressed() {
-        criarActivity();
-    }
 
 
     private void criarActivity() {
-        AlertDialog.Builder dlg = new AlertDialog.Builder(TelaSeguindo.this);
+        AlertDialog.Builder dlg = new AlertDialog.Builder(getContext());
         dlg.setMessage(R.string.ftc_perg_sessao).setPositiveButton(R.string.ftc_sim, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(TelaSeguindo.this, MainActivity.class));
-                finish();
+                startActivity(new Intent(getContext(), MainActivity.class));
             }
         }).setNeutralButton(R.string.ftc_cancelar, null);
         dlg.show();
     }
-    private void createDrawer() {
-        ProfileDrawerItem profile = new ProfileDrawerItem().withName(user.getDisplayName())
-                .withEmail(user.getEmail());
-        headerNavigation = new AccountHeaderBuilder()
-                .withActivity(this)
-                .withHeaderBackground(R.color.colorPrimaryDark)
-                .addProfiles(profile)
-                .withHeightPx(40)
-                .withProfileImagesVisible(false)
-                .build();
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.ftc_camp_salvos).withIcon(R.drawable.home_32px);
-        PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(R.string.ftc_criar_camp).withIcon(R.drawable.plus_32px);
-        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName(R.string.ftc_seguindo).withIcon(R.drawable.estrela_vazia);
-        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName(R.string.ftc_pesquisar).withIcon(R.drawable.search_48px);
-        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName(R.string.ftc_encerrar_sessao).withIcon(R.drawable.shutdown_32px);
-        Drawer drawer = new DrawerBuilder()
-                .withActivity(this)
-                .withSliderBackgroundDrawableRes(R.drawable.gradient)
-                .withToolbar(toolbar)
-                .withAccountHeader(headerNavigation)
-                .addDrawerItems(
-                        item1,
-                        new DividerDrawerItem(),
-                        item2,
-                        new DividerDrawerItem(),
-                        item3,
-                        new DividerDrawerItem(),
-                        item4,
-                        new DividerDrawerItem(),
-                        item5
-                )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (drawerItem.getIdentifier()==2) {
-                            Intent it = new Intent(TelaSeguindo.this, TelaNovoCamp.class);
-                            it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            it.putExtra("user", user);
-                            startActivity(it);
-                        }else if(drawerItem.getIdentifier()==1){
-                            Intent it = new Intent(TelaSeguindo.this, TelaCarregarCamp.class);
-                            it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            it.putExtra("user", user);
-                            startActivity(it);
-                        } else if(drawerItem.getIdentifier()==4){
-                            Intent it = new Intent(TelaSeguindo.this, TelaBuscar.class);
-                            it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            it.putExtra("user", user);
-                            startActivity(it);
-                        }else if (drawerItem.getIdentifier()==5) {
-                            criarActivity();
-                        }
 
-                        return false;
-                    }
-                })
-                .withSelectedItem(3)
-                .build();
-        drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        drawer.getActionBarDrawerToggle().setHomeAsUpIndicator(R.drawable.menu_32px);
-    }
     private static class CampeonatosAdapter2 extends BaseAdapter {
         private DatabaseReference userReference;
         private final Context ctx;

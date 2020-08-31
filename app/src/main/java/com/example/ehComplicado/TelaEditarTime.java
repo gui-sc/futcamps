@@ -1,46 +1,30 @@
 package com.example.ehComplicado;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import android.content.DialogInterface;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
-import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
-
 import com.example.ehComplicado.FirebaseHelper.JogadorHelper;
 import com.example.ehComplicado.FirebaseHelper.UsuarioHelper;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.mikepenz.materialdrawer.AccountHeader;
-import com.mikepenz.materialdrawer.AccountHeaderBuilder;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-
 import java.util.List;
-
 import model.bean.Campeonato;
 import model.bean.Jogador;
 import model.bean.Time;
@@ -48,49 +32,44 @@ import model.bean.Usuario;
 import model.dao.CampeonatoDAO;
 import model.dao.TimeDAO;
 
-public class TelaEditarTime extends AppCompatActivity {
+public class TelaEditarTime extends Fragment {
     private DatabaseReference timeReference, campReference;
-    private String campKey, timeKey;
-    AccountHeader headerNavigation;
+    private String campKey;
     private TimeDAO timeDAO;
     private Time time;
-    private Jogador jogador;
     private TextInputLayout nomeTextInput, dirigenteTextInput, cidadeTextInput;
     private TextInputEditText nomeEditText, dirigenteEditText, cidadeEditText;
     private String nome, dirigente, cidade;
     private boolean eraCabecaDeChave, primeira = false, segunda = false;
-    List<Usuario> usuarios;
-    UsuarioHelper helper1;
-    private ValueEventListener timeListener, campListener,campListener1;
-    JogadorHelper helper;
+    private List<Usuario> usuarios;
+    private ValueEventListener timeListener, campListener;
     private Switch swCabecaDeChave;
-    Toolbar toolbar;
-    FirebaseUser user;
+    private FirebaseUser user;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tela_editar_time);
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.ftc_editar_time);
-        campKey = getIntent().getStringExtra("campKey");
-        timeKey = getIntent().getStringExtra("timeKey");
-        user = getIntent().getParcelableExtra("user");
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_tela_editar_time,container,false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        campKey = getArguments().getString("campKey");
+        String timeKey = getArguments().getString("timeKey");
+        user = FirebaseAuth.getInstance().getCurrentUser();
         timeReference = FirebaseDatabase.getInstance().getReference().child("campeonato-times").child(campKey).child(timeKey);
         DatabaseReference jogadoresReference = FirebaseDatabase.getInstance().getReference().child("time-jogadores").child(timeKey);
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("campeonato-seguidores").child(campKey);
         campReference = FirebaseDatabase.getInstance().getReference().child("campeonatos").child(campKey);
         timeDAO = new TimeDAO();
-        swCabecaDeChave = findViewById(R.id.sw_cabecaDeChave);
-        nomeTextInput = findViewById(R.id.nome_text_input);
-        nomeEditText = findViewById(R.id.nome_edit_text);
-        dirigenteTextInput = findViewById(R.id.dirigente_text_input);
-        dirigenteEditText = findViewById(R.id.dirigente_edit_text);
-        cidadeTextInput = findViewById(R.id.cidade_text_input);
-        cidadeEditText = findViewById(R.id.cidade_edit_text);
-        ListView lstJogadores = findViewById(R.id.lst_jogadores);
+        swCabecaDeChave = view.findViewById(R.id.sw_cabecaDeChave);
+        nomeTextInput = view.findViewById(R.id.nome_text_input);
+        nomeEditText = view.findViewById(R.id.nome_edit_text);
+        dirigenteTextInput = view.findViewById(R.id.dirigente_text_input);
+        dirigenteEditText = view.findViewById(R.id.dirigente_edit_text);
+        cidadeTextInput = view.findViewById(R.id.cidade_text_input);
+        cidadeEditText = view.findViewById(R.id.cidade_edit_text);
         time = new Time();
         ValueEventListener mTimeListener = new ValueEventListener() {
             @Override
@@ -108,29 +87,14 @@ public class TelaEditarTime extends AppCompatActivity {
             }
         };
 
-        helper1 = new UsuarioHelper(userRef);
+        UsuarioHelper helper1 = new UsuarioHelper(userRef);
         usuarios = helper1.retrive();
         timeReference.addListenerForSingleValueEvent(mTimeListener);
         timeListener = mTimeListener;
-        helper = new JogadorHelper(jogadoresReference);
+        JogadorHelper helper = new JogadorHelper(jogadoresReference);
         final List<Jogador> jogadores = helper.retrive();
-        final ArrayAdapter<Jogador> adapter = new ArrayAdapter<>(this, R.layout.personalizado_list_item, jogadores);
-        lstJogadores.setAdapter(adapter);
-        lstJogadores.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                jogador = jogadores.get(position);
-                Intent it = new Intent(TelaEditarTime.this, TelaEditarJogador.class);
-                it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                it.putExtra("jogadorKey", jogador.getId());
-                it.putExtra("timeKey", timeKey);
-                it.putExtra("campKey", campKey);
-                it.putExtra("user", user);
-                startActivity(it);
-                finish();
-            }
-        });
-        createDrawer();
+        final ArrayAdapter<Jogador> adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, jogadores);
+        //createDrawer()
         swCabecaDeChave.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -156,15 +120,6 @@ public class TelaEditarTime extends AppCompatActivity {
         if (campListener != null) {
             campReference.removeEventListener(campListener);
         }
-        if (campListener1 != null){
-            campReference.removeEventListener(campListener1);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.ftc_menu_salvar, menu);
-        return true;
     }
 
     @Override
@@ -202,11 +157,12 @@ public class TelaEditarTime extends AppCompatActivity {
                                         }
                                     }
                                     altera();
-                                    Intent it = new Intent(TelaEditarTime.this, TelaEditarCamp.class);
+                                    Intent it = new Intent(getContext(), TelaEditarCamp.class);
                                     it.putExtra("user", user);
                                     it.putExtra("campKey", campKey);
-                                    startActivity(it);
-                                    finish();
+                                    TelaCamps t = (TelaCamps)getActivity();
+                                    t.startActivity(it);
+                                    t.finish();
                                 }
                             }
                         }
@@ -223,17 +179,14 @@ public class TelaEditarTime extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onBackPressed() {
-        criarActivity();
-    }
 
     private void criarActivity() {
-        Intent it = new Intent(TelaEditarTime.this, TelaEditarCamp.class);
+        Intent it = new Intent(getContext(), TelaEditarCamp.class);
         it.putExtra("user", user);
         it.putExtra("campKey", campKey);
-        startActivity(it);
-        finish();
+        TelaCamps t = (TelaCamps)getActivity();
+        t.startActivity(it);
+        t.finish();
     }
 
     private boolean valida(String s) {
@@ -246,11 +199,11 @@ public class TelaEditarTime extends AppCompatActivity {
         time.setCidade(cidade);
         time.setCabecaDeChave(swCabecaDeChave.isChecked());
         timeDAO.alterar(time, campKey);
-        Toast.makeText(this, R.string.timeAlterado, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.timeAlterado, Toast.LENGTH_SHORT).show();
     }
 
 
-    private void createDrawer() {
+   /* private void createDrawer() {
         headerNavigation = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.color.colorPrimaryDark)
@@ -326,5 +279,5 @@ public class TelaEditarTime extends AppCompatActivity {
         drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         drawer.getActionBarDrawerToggle().setHomeAsUpIndicator(R.drawable.menu_32px);
-    }
+    }*/
 }

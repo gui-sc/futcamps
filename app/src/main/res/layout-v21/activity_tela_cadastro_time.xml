@@ -4,115 +4,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fundograma2"
-    tools:context=".TelaCadastroTime">
-
+    android:background="@drawable/fundoestadio"
+    tools:context=".TelaPrincipalTimes">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"/>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/nome_text_input"
-        style="@style/Widget.Futcamps.TextInputLayout"
-        android:layout_width="300dp"
-        android:layout_height="80dp"
-        android:layout_margin="4dp"
-        android:hint="@string/ftc_hint_nome"
-        app:errorEnabled="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.414"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.104">
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" >
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/nome_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:inputType="text"
-            android:maxLines="1"
-            android:textColor="@android:color/white" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/dirigente_text_input"
-        style="@style/Widget.Futcamps.TextInputLayout"
-        android:layout_width="300dp"
-        android:layout_height="80dp"
-        android:layout_margin="4dp"
-        android:hint="@string/ftc_hint_responsavel"
-        app:errorEnabled="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-
-        app:layout_constraintHorizontal_bias="0.423"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.282">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/dirigente_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:inputType="text"
-            android:maxLines="1"
-            android:textColor="@android:color/white" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/cidade_text_input"
-        style="@style/Widget.Futcamps.TextInputLayout"
-        android:layout_width="300dp"
-        android:layout_height="80dp"
-        android:layout_margin="4dp"
-        android:hint="@string/ftc_hint_cidade"
-        app:errorEnabled="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.456">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/cidade_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:inputType="text"
-            android:maxLines="1"
-            android:textColor="@android:color/white" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <Switch
-        android:id="@+id/sw_cabecaDeChave"
-        android:layout_width="wrap_content"
+    </FrameLayout>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navigationView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/cabe_a_de_chave"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginStart="0dp"
+        android:background="?android:attr/windowBackground"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.244"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.572" />
-
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:itemBackground="@android:color/black"
+        app:itemIconTint="@android:color/white"
+        app:itemTextColor="@android:color/white"
+        app:menu="@menu/navigation_jogos"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

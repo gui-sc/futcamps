@@ -8,17 +8,17 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".TelaNovaPartida">
 
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:title="@string/ftc_nova_partida"
         android:background="@color/colorPrimary"
-        app:layout_scrollFlags="scroll|enterAlways"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_scrollFlags="scroll|enterAlways" />
 
 
     <LinearLayout
@@ -139,8 +139,8 @@
         android:id="@+id/txtX"
         android:layout_width="20dp"
         android:layout_height="60dp"
-        android:text="@string/x"
         android:gravity="center"
+        android:text="@string/x"
         android:textColor="@android:color/white"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -154,8 +154,8 @@
         android:id="@+id/lbl_placar_visitante"
         android:layout_width="40dp"
         android:layout_height="60dp"
-        android:text="@string/_0"
         android:gravity="center"
+        android:text="@string/_0"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="18sp"
@@ -217,7 +217,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/obs_text_input"
         style="@style/Widget.Futcamps.TextInputLayout"
-        android:layout_width="300dp"
+        android:layout_width="160dp"
         android:layout_height="80dp"
         android:hint="@string/ftc_observacoes"
         app:errorEnabled="true"
@@ -239,4 +239,17 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <Button
+        android:id="@+id/salvar_button"
+        style="@style/Widget.Futcamps.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ftc_prox"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.6" />
 </androidx.constraintlayout.widget.ConstraintLayout>
