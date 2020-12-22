@@ -106,6 +106,8 @@ public class TelaQuatroGrupos extends Fragment {
                             View tr = getLayoutInflater().inflate(R.layout.tabela_linha_layout, null, false);
                             TextView txtNome = tr.findViewById(R.id.nome);
                             txtNome.setText(time.getNome());
+                            TextView txtJgs = tr.findViewById(R.id.jgs);
+                            txtJgs.setText(String.valueOf(time.getJogos()));
                             TextView txtPontos = tr.findViewById(R.id.pts);
                             txtPontos.setText(String.valueOf(time.getPontos()));
                             TextView txtSg = tr.findViewById(R.id.sg);
@@ -120,6 +122,8 @@ public class TelaQuatroGrupos extends Fragment {
                         View tr = getLayoutInflater().inflate(R.layout.tabela_linha_layout, null, false);
                         TextView txtNome = tr.findViewById(R.id.nome);
                         txtNome.setText(time.getNome());
+                        TextView txtJgs = tr.findViewById(R.id.jgs);
+                        txtJgs.setText(String.valueOf(time.getJogos()));
                         TextView txtPontos = tr.findViewById(R.id.pts);
                         txtPontos.setText(String.valueOf(time.getPontos()));
                         TextView txtSg = tr.findViewById(R.id.sg);
@@ -134,6 +138,8 @@ public class TelaQuatroGrupos extends Fragment {
                         View tr = getLayoutInflater().inflate(R.layout.tabela_linha_layout, null, false);
                         TextView txtNome = tr.findViewById(R.id.nome);
                         txtNome.setText(time.getNome());
+                        TextView txtJgs = tr.findViewById(R.id.jgs);
+                        txtJgs.setText(String.valueOf(time.getJogos()));
                         TextView txtPontos = tr.findViewById(R.id.pts);
                         txtPontos.setText(String.valueOf(time.getPontos()));
                         TextView txtSg = tr.findViewById(R.id.sg);
@@ -200,6 +206,8 @@ public class TelaQuatroGrupos extends Fragment {
                 View tr = getLayoutInflater().inflate(R.layout.tabela_linha_layout, null, false);
                 TextView txtNome = tr.findViewById(R.id.nome);
                 txtNome.setText(getString(R.string.time_maiusculo));
+                TextView txtJgs = tr.findViewById(R.id.jgs);
+                txtJgs.setText(R.string.j);
                 TextView txtPontos = tr.findViewById(R.id.pts);
                 txtPontos.setText(getString(R.string.pts));
                 TextView txtSg = tr.findViewById(R.id.sg);
@@ -218,6 +226,8 @@ public class TelaQuatroGrupos extends Fragment {
                                     View tr = getLayoutInflater().inflate(R.layout.tabela_linha_layout, null, false);
                                     TextView txtNome = tr.findViewById(R.id.nome);
                                     txtNome.setText(time.getNome());
+                                    TextView txtJgs = tr.findViewById(R.id.jgs);
+                                    txtJgs.setText(String.valueOf(time.getJogos()));
                                     TextView txtPontos = tr.findViewById(R.id.pts);
                                     txtPontos.setText(String.valueOf(time.getPontos()));
                                     TextView txtSg = tr.findViewById(R.id.sg);
@@ -232,6 +242,8 @@ public class TelaQuatroGrupos extends Fragment {
                                 View tr = getLayoutInflater().inflate(R.layout.tabela_linha_layout, null, false);
                                 TextView txtNome = tr.findViewById(R.id.nome);
                                 txtNome.setText(time.getNome());
+                                TextView txtJgs = tr.findViewById(R.id.jgs);
+                                txtJgs.setText(String.valueOf(time.getJogos()));
                                 TextView txtPontos = tr.findViewById(R.id.pts);
                                 txtPontos.setText(String.valueOf(time.getPontos()));
                                 TextView txtSg = tr.findViewById(R.id.sg);
@@ -247,6 +259,8 @@ public class TelaQuatroGrupos extends Fragment {
                                 View tr = getLayoutInflater().inflate(R.layout.tabela_linha_layout, null, false);
                                 TextView txtNome = tr.findViewById(R.id.nome);
                                 txtNome.setText(time.getNome());
+                                TextView txtJgs = tr.findViewById(R.id.jgs);
+                                txtJgs.setText(String.valueOf(time.getJogos()));
                                 TextView txtPontos = tr.findViewById(R.id.pts);
                                 txtPontos.setText(String.valueOf(time.getPontos()));
                                 TextView txtSg = tr.findViewById(R.id.sg);

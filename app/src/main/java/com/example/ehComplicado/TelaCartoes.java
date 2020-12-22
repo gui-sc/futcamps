@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.example.ehComplicado.FirebaseHelper.JogadorHelper;
 import com.example.ehComplicado.FirebaseHelper.TimeHelper;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,7 +26,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 import java.util.List;
+
 import model.bean.CAmarelo;
 import model.bean.Campeonato;
 import model.bean.Jogador;
@@ -42,12 +49,15 @@ public class TelaCartoes extends Fragment {
     private ListView lstCa;
     private List<Time> times;
     private ValueEventListener partidaListener, campListener;
-    private Partida partida;
+    public Partida partida;
+    private List<Jogador> time1, time2;
+    private ArrayList<Jogador> gols, amarelos = new ArrayList<>();
+    private ArrayList<String> amarelados = new ArrayList<>();
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_tela_cartoes,container,false);
+        return inflater.inflate(R.layout.activity_tela_cartoes, container, false);
     }
 
     @Override
@@ -58,6 +68,7 @@ public class TelaCartoes extends Fragment {
         final ListView lstJogadoresCaVisitante = view.findViewById(R.id.ftc_lista__jogadores_ca_visitante);
         jogadorDAO = new JogadorDAO();
         amareloDAO = new CAmareloDAO();
+        gols = getArguments().getParcelableArrayList("gols");
         final PartidaDAO partidaDAO = new PartidaDAO();
         user = FirebaseAuth.getInstance().getCurrentUser();
         campKey = getArguments().getString("campKey");
@@ -80,10 +91,10 @@ public class TelaCartoes extends Fragment {
         JogadorHelper jogadorHelperTime2 = new JogadorHelper(jogadorReference);
         final ArrayAdapter<Jogador> ca = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item);
         lstCa.setAdapter(ca);
-        List<Jogador> primeiraLista1 = jogadorHelperTime1.retrive();
-        List<Jogador> primeiraLista2 = jogadorHelperTime2.retrive();
-        final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, primeiraLista1);
-        final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, primeiraLista2);
+        time1 = jogadorHelperTime1.retrive();
+        time2 = jogadorHelperTime2.retrive();
+        final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, time1);
+        final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, time2);
         ValueEventListener mPartidaListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -103,20 +114,45 @@ public class TelaCartoes extends Fragment {
         lstJogadoresCaMandante.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ca.add(jogadoresGeral.getItem(position));
-                lstCa.setAdapter(ca);
+                int i = 0;
+                for (String j :
+                        amarelados) {
+                    if (j.equals(jogadoresGeral.getItem(position).getId())) {
+                        i++;
+                    }
+                }
+                if (i < 2) {
+                    ca.add(jogadoresGeral.getItem(position));
+                    lstCa.setAdapter(ca);
+                    amarelados.add(jogadoresGeral.getItem(position).getId());
+                } else {
+                    Toast.makeText(getContext(), "Não é mais possível atribuir cartões amarelos para esse jogador", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         lstJogadoresCaVisitante.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ca.add(jogadorArrayAdapter.getItem(position));
-                lstCa.setAdapter(ca);
+                int i = 0;
+                for (String j :
+                        amarelados) {
+                    if (j.equals(jogadorArrayAdapter.getItem(position).getId())) {
+                        i++;
+                    }
+                }
+                if (i < 2) {
+                    ca.add(jogadorArrayAdapter.getItem(position));
+                    lstCa.setAdapter(ca);
+                    amarelados.add(jogadorArrayAdapter.getItem(position).getId());
+                } else {
+                    Toast.makeText(getContext(), "Não é mais possível atribuir cartões amarelos para esse jogador", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         lstCa.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                amarelados.remove(ca.getItem(position).getId());
                 ca.remove(ca.getItem(position));
                 lstCa.setAdapter(ca);
             }
@@ -130,12 +166,8 @@ public class TelaCartoes extends Fragment {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         Campeonato camp = dataSnapshot.getValue(Campeonato.class);
                         for (int i = 0; i < lstCa.getCount(); i++) {
-                            CAmarelo amarelo = new CAmarelo();
                             Jogador jogador = (Jogador) lstCa.getItemAtPosition(i);
                             jogador = jogadorDAO.configurar(times, jogador);
-                            amarelo.setJogador(jogador.getApelido());
-                            amarelo.setTime(jogador.getTime().getNome());
-                            amareloDAO.inserir(amarelo, partida.getId());
                             if (jogador.isPendurado()) {
                                 jogador.setSuspenso(true);
                                 jogador.setPendurado(false);
@@ -144,12 +176,14 @@ public class TelaCartoes extends Fragment {
                             } else {
                                 jogador.setCa(jogador.getCa() + 1);
                             }
-                            jogadorDAO.atualizar(jogador, jogador.getIdTime(), campKey);
+                            amarelos.add(jogador);
                         }
                         TelaVermelhos t = new TelaVermelhos();
                         Bundle data = new Bundle();
-                        data.putString("campKey",campKey);
-                        data.putParcelable("partida",partida);
+                        data.putString("campKey", campKey);
+                        data.putParcelable("partida", partida);
+                        data.putParcelableArrayList("gols", gols);
+                        data.putParcelableArrayList("amarelos", amarelos);
                         t.setArguments(data);
                         openFragment(t);
                     }
@@ -177,9 +211,9 @@ public class TelaCartoes extends Fragment {
         }
     }
 
-    public void openFragment(Fragment fragment){
+    public void openFragment(Fragment fragment) {
         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, fragment);
+        transaction.replace(R.id.container, fragment, "vermelhos");
         transaction.addToBackStack(null);
         transaction.commit();
     }

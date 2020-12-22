@@ -92,6 +92,7 @@ public class Campeonato implements Parcelable{
     result.put("nome",nome);
     result.put("cidade",cidade);
     result.put("ano",ano);
+    result.put("classificados",classificados);
     result.put("premiacao",premiacao);
     result.put("numTimes",numTimes);
     result.put("numGrupos",numGrupos);
@@ -109,6 +110,7 @@ public class Campeonato implements Parcelable{
     result.put("zerarCartoesOitavas",zerarCartoesOitavas);
     result.put("zerarCartoesQuartas",zerarCartoesQuartas);
     result.put("zerarCartoesSemi",zerarCartoesSemi);
+    result.put("cartoesPendurado",cartoesPendurado);
     return result;
   }
 

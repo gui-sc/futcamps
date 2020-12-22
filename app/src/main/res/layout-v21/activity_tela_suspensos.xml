@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/fundovermelho"
+    android:background="@drawable/fundoverde"
     tools:context=".TelaSuspensos">
 
     <LinearLayout
@@ -18,10 +18,11 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             app:title="@string/ftc_suspensos"
+            app:titleTextColor="@color/md_red_A400"
+            android:background="@android:color/black"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:layout_marginBottom="40dp"/>
+            android:layout_marginBottom="50dp"/>
 
         <TableLayout
             android:id="@+id/tabela_suspensos"

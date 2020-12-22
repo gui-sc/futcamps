@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ehComplicado.FirebaseHelper.JogadorHelper;
 import com.example.ehComplicado.FirebaseHelper.TimeHelper;
@@ -27,17 +28,22 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import model.bean.CAmarelo;
 import model.bean.CVermelho;
 import model.bean.Campeonato;
+import model.bean.Gols;
 import model.bean.Jogador;
 import model.bean.Partida;
 import model.bean.Resultados;
 import model.bean.Time;
 import model.bean.Usuario;
+import model.dao.CAmareloDAO;
 import model.dao.CVermelhoDAO;
 import model.dao.CampeonatoDAO;
+import model.dao.GolsDAO;
 import model.dao.JogadorDAO;
 import model.dao.PartidaDAO;
 import model.dao.ResultadosDAO;
@@ -54,14 +60,16 @@ public class TelaVermelhos extends Fragment {
     private CVermelhoDAO vermelhoDAO;
     private List<Time> times;
     private ValueEventListener partidaListener, campListener2;
-    private Partida partida;
+    public Partida partida;
     private ListView lstCv;
     private Campeonato camp, campNome;
     private TimeDAO timeDAO;
     private Resultados resultados;
     private ResultadosDAO resultadosDAO;
     private PartidaDAO partidaDAO;
-    private List<Jogador> jogadores1;
+    private List<Jogador> jogadores1, todosJogadoresTime1, todosJogadoresTime2;
+    public ArrayList<Jogador> gols, amarelos;
+    private ArrayList<String> vermelhos = new ArrayList<>();
 
     @Nullable
     @Override
@@ -79,6 +87,8 @@ public class TelaVermelhos extends Fragment {
         vermelhoDAO = new CVermelhoDAO();
         timeDAO = new TimeDAO();
         camp = new Campeonato();
+        gols = getArguments().getParcelableArrayList("gols");
+        amarelos = getArguments().getParcelableArrayList("amarelos");
         campNome = new Campeonato();
         resultados = new Resultados();
         resultadosDAO = new ResultadosDAO();
@@ -95,19 +105,20 @@ public class TelaVermelhos extends Fragment {
                 .child("campeonato-times").child(campKey);
         TimeHelper timeHelper = new TimeHelper(timeReference);
         times = timeHelper.retrive();
+
         DatabaseReference jogadorReference = FirebaseDatabase.getInstance().getReference()
                 .child("time-jogadores").child(partida.getIdMandante());
         JogadorHelper jogadorHelperTime1 = new JogadorHelper(jogadorReference);
         jogadorReference = FirebaseDatabase.getInstance().getReference()
                 .child("time-jogadores").child(partida.getIdVisitante());
         JogadorHelper jogadorHelperTime2 = new JogadorHelper(jogadorReference);
-        List<Jogador> primeiraLista1 = jogadorHelperTime1.retrive();
-        List<Jogador> primeiraLista2 = jogadorHelperTime2.retrive();
+        todosJogadoresTime1 = jogadorHelperTime1.retrive();
+        todosJogadoresTime2 = jogadorHelperTime2.retrive();
         final TextView lblMandante = view.findViewById(R.id.lbl_mandante);
         final TextView lblVisitante = view.findViewById(R.id.lbl_visitante);
         final ArrayAdapter<Jogador> cv = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item);
-        final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, primeiraLista1);
-        final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, primeiraLista2);
+        final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, todosJogadoresTime1);
+        final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, todosJogadoresTime2);
 
         ValueEventListener mPartidaListener = new ValueEventListener() {
             @Override
@@ -131,20 +142,43 @@ public class TelaVermelhos extends Fragment {
         lstJogadoresCvMandante.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                cv.add(jogadoresGeral.getItem(position));
-                lstCv.setAdapter(cv);
+                int i = 0;
+                for (String j :
+                        vermelhos) {
+                    if (j.equals(jogadoresGeral.getItem(position).getId())) {
+                        i++;
+                    }
+                }
+                if (i == 0) {
+                    cv.add(jogadoresGeral.getItem(position));
+                    lstCv.setAdapter(cv);
+                    vermelhos.add(jogadoresGeral.getItem(position).getId());
+                } else {
+                    Toast.makeText(getContext(), "Não é mais possível atribuir cartões vermelhos para esse jogador", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         lstJogadoresCvVisitante.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                cv.add(jogadorArrayAdapter.getItem(position));
-                lstCv.setAdapter(cv);
+                int i = 0;
+                for (String j :
+                        vermelhos) {
+                    if (j.equals(jogadorArrayAdapter.getItem(position).getId())) {
+                        i++;
+                    }
+                }
+                if (i == 0) {
+                    cv.add(jogadorArrayAdapter.getItem(position));
+                    lstCv.setAdapter(cv);
+                    vermelhos.add(jogadorArrayAdapter.getItem(position).getId());
+                }
             }
         });
         lstCv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                vermelhos.remove(cv.getItem(position).getId());
                 cv.remove(cv.getItem(position));
                 lstCv.setAdapter(cv);
             }
@@ -161,6 +195,22 @@ public class TelaVermelhos extends Fragment {
         btnSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                for (int i = 0; i < amarelos.size(); i++) {
+                    CAmarelo ca = new CAmarelo();
+                    ca.setJogador(amarelos.get(i).getApelido());
+                    ca.setTime(amarelos.get(i).getTime().getNome());
+                    new CAmareloDAO().inserir(ca, partida.getId());
+                    new JogadorDAO().atualizar(amarelos.get(i), amarelos.get(i).getIdTime(), campKey);
+                }
+                for (int i = 0; i < gols.size(); i++) {
+                    Gols gol = new Gols();
+                    gol.setJogador(gols.get(i).getApelido());
+                    gol.setTime(gols.get(i).getTime().getNome());
+                    new GolsDAO().inserir(gol, partida.getId());
+                    if (!gols.get(i).getApelido().equals("Gol contra")) {
+                        new JogadorDAO().atualizar(gols.get(i), gols.get(i).getIdTime(), campKey);
+                    }
+                }
                 for (int i = 0; i < lstCv.getCount(); i++) {
                     CVermelho vermelho = new CVermelho();
                     Jogador jogador = (Jogador) lstCv.getItemAtPosition(i);
@@ -179,8 +229,6 @@ public class TelaVermelhos extends Fragment {
                         partida.setCampeonato(camp);
                         if (partida.getPenaltisMandante() > partida.getPenaltisVisitante()) {
                             if (partida.getCampeonato().isFinal()) {
-                                timeDAO.novaPartida(partida.getMandante(), campKey);
-                                timeDAO.novaPartida(partida.getVisitante(), campKey);
                                 resultados.setCampeao(partida.getMandante().getNome());
                                 resultados.setViceCampeao(partida.getVisitante().getNome());
                                 Jogador jogador = jogadorDAO.artilheiro(jogadores1, times);
@@ -190,16 +238,12 @@ public class TelaVermelhos extends Fragment {
                                 partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                                 campDAO.finalizar(partida.getCampeonato(), usuarios, campNome.getNome());
                             } else {
-                                timeDAO.novaPartida(partida.getMandante(), campKey);
-                                timeDAO.novaPartida(partida.getVisitante(), campKey);
                                 timeDAO.eliminar(partida.getVisitante(), campKey);
                                 partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
 
                             }
                         } else if (partida.getPenaltisVisitante() > partida.getPenaltisMandante()) {
                             if (partida.getCampeonato().isFinal()) {
-                                timeDAO.novaPartida(partida.getMandante(), campKey);
-                                timeDAO.novaPartida(partida.getVisitante(), campKey);
                                 resultados.setCampeao(partida.getVisitante().getNome());
                                 resultados.setViceCampeao(partida.getMandante().getNome());
                                 Jogador jogador = jogadorDAO.artilheiro(jogadores1, times);
@@ -209,8 +253,6 @@ public class TelaVermelhos extends Fragment {
                                 partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                                 campDAO.finalizar(partida.getCampeonato(), usuarios, campNome.getNome());
                             } else {
-                                timeDAO.novaPartida(partida.getMandante(), campKey);
-                                timeDAO.novaPartida(partida.getVisitante(), campKey);
                                 timeDAO.eliminar(partida.getMandante(), campKey);
                                 partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                             }
@@ -229,8 +271,6 @@ public class TelaVermelhos extends Fragment {
                                 partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                             } else {
                                 if (partida.getCampeonato().isFinal()) {
-                                    timeDAO.novaPartida(partida.getMandante(), campKey);
-                                    timeDAO.novaPartida(partida.getVisitante(), campKey);
                                     resultados.setCampeao(partida.getMandante().getNome());
                                     resultados.setViceCampeao(partida.getVisitante().getNome());
                                     Jogador jogador = jogadorDAO.artilheiro(jogadores1, times);
@@ -240,8 +280,6 @@ public class TelaVermelhos extends Fragment {
                                     partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                                     campDAO.finalizar(partida.getCampeonato(), usuarios, campNome.getNome());
                                 } else {
-                                    timeDAO.novaPartida(partida.getMandante(), campKey);
-                                    timeDAO.novaPartida(partida.getVisitante(), campKey);
                                     timeDAO.eliminar(partida.getVisitante(), campKey);
                                     partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                                 }
@@ -260,8 +298,6 @@ public class TelaVermelhos extends Fragment {
                                 partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                             } else {
                                 if (partida.getCampeonato().isFinal()) {
-                                    timeDAO.novaPartida(partida.getMandante(), campKey);
-                                    timeDAO.novaPartida(partida.getVisitante(), campKey);
                                     resultados.setCampeao(partida.getVisitante().getNome());
                                     resultados.setViceCampeao(partida.getMandante().getNome());
                                     Jogador jogador = jogadorDAO.artilheiro(jogadores1, times);
@@ -271,8 +307,6 @@ public class TelaVermelhos extends Fragment {
                                     partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                                     campDAO.finalizar(partida.getCampeonato(), usuarios, campNome.getNome());
                                 } else {
-                                    timeDAO.novaPartida(partida.getMandante(), campKey);
-                                    timeDAO.novaPartida(partida.getVisitante(), campKey);
                                     timeDAO.eliminar(partida.getMandante(), campKey);
                                     partidaDAO.cadastrarCompleto(partida, campKey, usuarios, campNome.getNome());
                                 }
@@ -313,6 +347,7 @@ public class TelaVermelhos extends Fragment {
         });
 
     }
+
 
     @Override
     public void onStop() {

@@ -19,6 +19,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.example.ehComplicado.FirebaseHelper.CampeonatoHelper;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -66,48 +68,20 @@ public class BuscarFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 camp = listBusca.get(position);
+                final Bundle data = new Bundle();
+                data.putString("campKey", camp.getId());
                 if (camp.isFaseDeGrupos()){
-                    Intent it = new Intent(getContext(),TelaQuatroGrupos.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",camp.getId());
-                    TelaCarregarCamp t = (TelaCarregarCamp)getActivity();
-                    t.startActivity(it);
-                    t.finish();
-                }else if(camp.isOitavas()){
-                    Intent it = new Intent(getContext(),TelaOitavas.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",camp.getId());
-                    TelaCarregarCamp t = (TelaCarregarCamp)getActivity();
-                    t.startActivity(it);
-                    t.finish();
-                }else if(camp.isQuartas()){
-                    Intent it = new Intent(getContext(),TelaQuartas.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",camp.getId());
-                    TelaCarregarCamp t = (TelaCarregarCamp)getActivity();
-                    t.startActivity(it);
-                    t.finish();
-                }else if(camp.isSemi()){
-                    Intent it = new Intent(getContext(),TelaSemi.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",camp.getId());
-                    TelaCarregarCamp t = (TelaCarregarCamp)getActivity();
-                    t.startActivity(it);
-                    t.finish();
-                }else if(camp.isFinal()){
-                    Intent it = new Intent(getContext(),TelaFinal.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",camp.getId());
-                    TelaCarregarCamp t = (TelaCarregarCamp)getActivity();
-                    t.startActivity(it);
-                    t.finish();
+                    TelaQuatroGrupos quatroGrupos = new TelaQuatroGrupos();
+                    quatroGrupos.setArguments(data);
+                    openFragment(quatroGrupos);
+                }else if (camp.isOitavas() || camp.isQuartas() || camp.isSemi() || camp.isFinal()) {
+                    TelaOitavas t = new TelaOitavas();
+                    t.setArguments(data);
+                    openFragment(t);
                 }else if(camp.isFinalizado()){
-                    Intent it = new Intent(getContext(),TelaPremios.class);
-                    it.putExtra("user",user);
-                    it.putExtra("campKey",camp.getId());
-                    TelaCarregarCamp t = (TelaCarregarCamp)getActivity();
-                    t.startActivity(it);
-                    t.finish();
+                    TelaPremios premios = new TelaPremios();
+                    premios.setArguments(data);
+                    openFragment(premios);
                 }else{
                     Toast.makeText(getContext(), R.string.ftc_aviso_campeonato, Toast.LENGTH_SHORT).show();
                 }
@@ -130,6 +104,13 @@ public class BuscarFragment extends Fragment {
                 }
             }
         });
+    }
+
+    public void openFragment(Fragment fragment) {
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     public static BuscarFragment newInstance(){
@@ -185,11 +166,9 @@ public class BuscarFragment extends Fragment {
             }else if (campeonato.isFinalizado()){
                 situacao.setText(R.string.ftc_finalizado);
                 situacao.setTextColor(Color.RED);
-            }else if(campeonato.isFaseDeGrupos() || campeonato.isOitavas() || campeonato.isQuartas() || campeonato.isSemi() || campeonato.isFinal()){
+            }else{
                 situacao.setText(R.string.ftc_td_ok);
                 situacao.setTextColor(Color.BLUE);
-            }else{
-                situacao.setText(R.string.ftc_nao_ini);
             }
             if (!usuarioSegue){
                 star.setImageResource(R.drawable.estrela_vazia);

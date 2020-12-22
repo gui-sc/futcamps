@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fundoestadio"
+    android:background="@drawable/fundoverde"
     android:weightSum="10"
     tools:context=".HomeFragment">
 
@@ -20,23 +20,28 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:title="@string/ftc_camp_salvos" />
+            android:background="@android:color/black"
+            android:title="@string/ftc_camp_salvos"
+            app:titleTextColor="@android:color/white" />
 
-        <ListView
-            android:id="@+id/lst_camp"
-            android:layout_width="match_parent"
-            android:layout_height="500dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="20dp"
-            android:dividerHeight="15dp"
-            android:paddingTop="2dp"
-            tools:ignore="NestedScrolling"
-            tools:listitem="@layout/linearlayout_camp">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-        </ListView>
+            <ListView
+                android:id="@+id/lst_camp"
+                android:layout_width="match_parent"
+                android:layout_height="500dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
+                android:dividerHeight="15dp"
+                android:paddingTop="2dp"
+                tools:ignore="NestedScrolling"
+                tools:listitem="@layout/linearlayout_camp">
 
+            </ListView>
+        </RelativeLayout>
     </LinearLayout>
 </ScrollView>

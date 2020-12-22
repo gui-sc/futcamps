@@ -47,6 +47,7 @@ public class TimeDAO {
     }
 
     public void novaPartida(Time time, String campKey) {
+        time.setJogos(time.getJogos()+1);
         Map<String, Object> timeValues = time.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/times/" + time.getId() + "/", timeValues);

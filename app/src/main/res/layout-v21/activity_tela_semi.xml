@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fundograma2"
+    android:background="@drawable/fundoverde"
     tools:context=".TelaSemi">
 
 
@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:title="@string/ftc_semi_finais"
-        android:background="@color/colorPrimary"
+        app:titleTextColor="@android:color/white"
+        android:background="@android:color/black"
         android:layout_marginBottom="140dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"

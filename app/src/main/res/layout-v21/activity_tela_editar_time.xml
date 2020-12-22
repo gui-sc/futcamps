@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fundoestadio"
+    android:background="@drawable/fundoverde"
     tools:context=".TelaEditarTime">
 
     <LinearLayout
@@ -19,7 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
-            android:background="@color/colorPrimary"
+            app:titleTextColor="@android:color/white"
+            android:background="@android:color/black"
             app:title="@string/ftc_editar_time" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -106,6 +107,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/ftc_apagar_time"
                 android:textSize="18sp"
+                android:textColor="@android:color/black"
                 android:layout_alignParentEnd="true"/>
 
             <Button

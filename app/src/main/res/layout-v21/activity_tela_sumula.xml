@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fundograma"
+    android:background="@drawable/fundoverde"
     tools:context=".TelaSumula">
 
     <androidx.appcompat.widget.Toolbar
@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         app:title="@string/ftc_sumula"
-        android:background="@color/colorPrimary"
+        app:titleTextColor="@android:color/white"
+        android:background="@android:color/black"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

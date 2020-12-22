@@ -33,12 +33,12 @@ public class TelaPrincipalJogos extends AppCompatActivity
         data.putString("campKey", camp.getId());
         TelaJogos t = new TelaJogos();
         t.setArguments(data);
-        openFragment(t);
+        openFragment(t,"jogos");
     }
 
-    public void openFragment(Fragment fragment) {
+    public void openFragment(Fragment fragment, String tag) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, fragment);
+        transaction.replace(R.id.container, fragment,tag);
         transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -51,22 +51,22 @@ public class TelaPrincipalJogos extends AppCompatActivity
             case R.id.jogos_button:
                 TelaJogos jogos = new TelaJogos();
                 jogos.setArguments(data);
-                openFragment(jogos);
+                openFragment(jogos,"jogos");
                 break;
             case R.id.artilheiros_button:
                 TelaArtilheiros artilheiros = new TelaArtilheiros();
                 artilheiros.setArguments(data);
-                openFragment(artilheiros);
+                openFragment(artilheiros,"artilheiros");
                 break;
             case R.id.pendurados_button:
                 TelaPendurados pendurados = new TelaPendurados();
                 pendurados.setArguments(data);
-                openFragment(pendurados);
+                openFragment(pendurados,"pendurados");
                 break;
             case R.id.suspensos_button:
                 TelaSuspensos suspensos = new TelaSuspensos();
                 suspensos.setArguments(data);
-                openFragment(suspensos);
+                openFragment(suspensos,"suspensos");
                 break;
             case R.id.voltar_button:
                 if (camp.getUid().equals(user.getUid())) {
@@ -83,5 +83,33 @@ public class TelaPrincipalJogos extends AppCompatActivity
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        TelaVermelhos f = (TelaVermelhos) getSupportFragmentManager().findFragmentByTag("vermelhos");
+        if(f != null){
+            if(f.isVisible()){
+                TelaCartoes pendurados = new TelaCartoes();
+                Bundle data = new Bundle();
+                data.putString("campKey", camp.getId());
+                data.putParcelableArrayList("gols",f.gols);
+                data.putParcelable("partida", f.partida);
+                pendurados.setArguments(data);
+                openFragment(pendurados,"amarelos");
+            }
+        }
+        TelaCartoes c = (TelaCartoes)getSupportFragmentManager().findFragmentByTag("amarelos");
+        if(c != null){
+            if(c.isVisible()){
+                TelaGols t = new TelaGols();
+                Bundle data = new Bundle();
+                data.putString("campKey",camp.getId());
+                data.putParcelable("partida",c.partida);
+                t.setArguments(data);
+                openFragment(t,"gols");
+            }
+        }
+
     }
 }

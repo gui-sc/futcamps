@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fundograma2"
+    android:background="@drawable/fundoverde"
     tools:context=".TelaCadastroJogador">
-
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:clipChildren="false"
+      android:clipToPadding="false"
+      android:orientation="vertical">
 
   <androidx.appcompat.widget.Toolbar
       android:id="@+id/toolbar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:title="@string/ftc_cadastro_jogador"
-      android:background="@color/colorPrimary"
+      app:titleTextColor="@android:color/white"
+      android:background="@android:color/black"
       app:layout_constraintHorizontal_bias="0.0"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
@@ -25,13 +31,7 @@
       android:layout_height="30dp"
       android:text="@string/ftc_lbl_time"
       android:textColor="@android:color/white"
-      android:textSize="20sp"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.112"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintVertical_bias="0.105" />
+      android:textSize="20sp" />
 
   <com.google.android.material.textfield.TextInputLayout
       android:id="@+id/nome_text_input"
@@ -40,13 +40,8 @@
       android:layout_height="80dp"
       android:layout_margin="4dp"
       android:hint="@string/ftc_hint_nome"
-      app:errorEnabled="true"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.234"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintVertical_bias="0.188">
+      android:layout_gravity="center"
+      app:errorEnabled="true">
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/nome_edit_text"
@@ -66,15 +61,9 @@
       android:layout_width="300dp"
       android:layout_height="80dp"
       android:layout_margin="4dp"
-
+      android:layout_gravity="center"
       android:hint="@string/ftc_hint_apelido"
-      app:errorEnabled="true"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.234"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintVertical_bias="0.356">
+      app:errorEnabled="true">
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/apelido_edit_text"
@@ -94,14 +83,9 @@
       android:layout_width="300dp"
       android:layout_height="80dp"
       android:layout_margin="4dp"
+      android:layout_gravity="center"
       android:hint="@string/ftc_data_de_nascimento"
-      app:errorEnabled="true"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.252"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintVertical_bias="0.52">
+      app:errorEnabled="true">
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/idade_edit_text"
@@ -120,12 +104,10 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="@string/ftc_salvar"
-      android:textSize="18sp"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.9"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintVertical_bias="0.65" />
+      android:layout_marginRight="20dp"
+      android:layout_marginLeft="20dp"
+      android:layout_gravity="end"
+      android:textSize="18sp" />
+  </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

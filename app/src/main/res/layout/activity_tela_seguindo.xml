@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:weightSum="10"
-    android:background="@drawable/fundoestadio"
+    android:background="@drawable/fundoverde"
     tools:context=".TelaSeguindo">
 
     <LinearLayout
@@ -17,22 +17,22 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
+            app:titleTextColor="@android:color/white"
+            android:background="@android:color/black"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:title="Seguindo"
-            android:background="@color/colorPrimary"
+            android:layout_marginBottom="20dp"
             />
 
         <ListView
             android:id="@+id/lst_camp"
             android:layout_width="match_parent"
             android:layout_height="500dp"
-            android:paddingTop="20dp"
             android:layout_marginBottom="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             tools:listitem="@layout/linearlayout_camp2"
-            tools:ignore="NestedScrolling"
             android:dividerHeight="15dp"/>
 
     </LinearLayout>

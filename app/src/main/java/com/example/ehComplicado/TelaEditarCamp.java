@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -39,7 +40,7 @@ import model.dao.CampeonatoDAO;
 public class TelaEditarCamp extends Fragment {
 
     private DatabaseReference campReference;
-    private ValueEventListener campListener;
+    private ValueEventListener campListener, campListener2,campListener3;
     private String campKey;
     private TextInputLayout nomeTextInput;
     private TextInputLayout cidadeTextInput;
@@ -117,6 +118,61 @@ public class TelaEditarCamp extends Fragment {
                 Toast.makeText(getContext(), R.string.codigoCopiado, Toast.LENGTH_SHORT).show();
             }
         });
+        Button btnSalvar = view.findViewById(R.id.btn_salvar);
+        Button btnApagar = view.findViewById(R.id.btn_apagar);
+        btnSalvar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ValueEventListener eventListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        camp = dataSnapshot.getValue(Campeonato.class);
+                        nome = String.valueOf(nomeEditText.getText());
+                        cidade = String.valueOf(cidadeEditText.getText());
+                        premiacao = String.valueOf(premiacaoEditText.getText());
+                        if (!valida(nome)) {
+                            nomeTextInput.setError(getString(R.string.ftc_aviso_vazio));
+                        } else {
+                            nomeTextInput.setError(null);
+                            if (!valida(cidade)) {
+                                cidadeTextInput.setError(getString(R.string.ftc_aviso_vazio));
+                            } else {
+                                cidadeTextInput.setError(null);
+                                alterar();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                };
+                campReference.addListenerForSingleValueEvent(eventListener);
+                campListener2 = eventListener;
+            }
+        });
+        btnApagar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ValueEventListener eventListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        camp = dataSnapshot.getValue(Campeonato.class);
+                        new CampeonatoDAO().excluir(camp,user.getUid(),usuarios);
+                        Intent it = new Intent(getContext(), TelaCarregarCamp.class);
+                        startActivity(it);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                };
+                campReference.addListenerForSingleValueEvent(eventListener);
+                campListener3 = eventListener;
+            }
+        });
     }
 
     @Override
@@ -124,6 +180,12 @@ public class TelaEditarCamp extends Fragment {
         super.onStop();
         if (campListener != null) {
             campReference.removeEventListener(campListener);
+        }
+        if (campListener2 != null) {
+            campReference.removeEventListener(campListener2);
+        }
+        if (campListener3 != null) {
+            campReference.removeEventListener(campListener3);
         }
     }
 

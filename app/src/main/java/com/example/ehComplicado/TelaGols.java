@@ -4,7 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +17,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.ehComplicado.FirebaseHelper.JogadorHelper;
 import com.example.ehComplicado.FirebaseHelper.TimeHelper;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,8 +27,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import model.bean.Gols;
 import model.bean.Jogador;
 import model.bean.Partida;
@@ -43,12 +49,14 @@ public class TelaGols extends Fragment {
     private DatabaseReference campReference;
     private GolsDAO golDAO;
     private JogadorDAO jogadorDAO;
+    private Jogador golContraMandante, golContraVisitante;
     private int golsMandante, golsVisitante;
+    private List<Jogador> time1, time2;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_gols,container,false);
+        return inflater.inflate(R.layout.activity_gols, container, false);
     }
 
     @Override
@@ -73,25 +81,25 @@ public class TelaGols extends Fragment {
         TimeHelper timeHelper = new TimeHelper(timeReference);
         final TextView lblMandante = view.findViewById(R.id.lbl_mandante);
         final TextView lblVisitante = view.findViewById(R.id.lbl_visitante);
-        times = timeHelper.retrive();
         DatabaseReference jogadorReference = FirebaseDatabase.getInstance().getReference()
                 .child("time-jogadores").child(partida.getIdMandante());
         JogadorHelper jogadorHelperTime1 = new JogadorHelper(jogadorReference);
         jogadorReference = FirebaseDatabase.getInstance().getReference()
                 .child("time-jogadores").child(partida.getIdVisitante());
         JogadorHelper jogadorHelperTime2 = new JogadorHelper(jogadorReference);
-        List<Jogador> primeiraLista1 = jogadorHelperTime1.retrive();
-        List<Jogador> primeiraLista2 = jogadorHelperTime2.retrive();
-        Jogador golContraMandante = new Jogador();
+        times = timeHelper.retrive();
+        time1 = jogadorHelperTime1.retrive();
+        time2 = jogadorHelperTime2.retrive();
+        golContraMandante = new Jogador();
         golContraMandante.setApelido("Gol contra");
-        Jogador golContraVisitante = new Jogador();
+        golContraVisitante = new Jogador();
         golContraVisitante.setApelido("Gol contra");
-        golContraMandante.setTime(partida.getMandante());
-        golContraVisitante.setTime(partida.getVisitante());
-        primeiraLista1.add(golContraMandante);
-        primeiraLista2.add(golContraVisitante);
-        final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, primeiraLista1);
-        final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, primeiraLista2);
+        golContraMandante.setIdTime(partida.getIdMandante());
+        golContraVisitante.setIdTime(partida.getIdVisitante());
+        time1.add(golContraMandante);
+        time2.add(golContraVisitante);
+        final ArrayAdapter<Jogador> jogadoresGeral = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, time1);
+        final ArrayAdapter<Jogador> jogadorArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, time2);
         final ArrayAdapter<Jogador> gols = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item);
         ValueEventListener mPartidaListener = new ValueEventListener() {
             @Override
@@ -152,37 +160,31 @@ public class TelaGols extends Fragment {
             @Override
             public void onClick(View v) {
                 if (golsMandante == partida.getPlacarMandante() && golsVisitante == partida.getPlacarVisitante()) {
+
+                    ArrayList<Jogador> gols = new ArrayList<>();
                     for (int i = 0; i < lstGols.getCount(); i++) {
-                        Gols gol = new Gols();
                         Jogador jogador = (Jogador) lstGols.getItemAtPosition(i);
-                        if (!jogador.getApelido().equals("Gol contra")) {
-                            jogador = jogadorDAO.configurar(times, jogador);
-                            jogador.setGols(jogador.getGols() + 1);
-                            gol.setJogador(jogador.getApelido());
-                            gol.setTime(jogador.getTime().getNome());
-                            golDAO.inserir(gol, partida.getId());
-                            jogadorDAO.atualizar(jogador, jogador.getIdTime(), campKey);
-                        } else {
-                            gol.setJogador(jogador.getApelido());
-                            gol.setTime(jogador.getTime().getNome());
-                            golDAO.inserir(gol,partida.getId());
-                        }
+                        jogador = jogadorDAO.configurar(times, jogador);
+                        jogador.setGols(jogador.getGols() + 1);
+                        gols.add(jogador);
                     }
                     TelaCartoes t = new TelaCartoes();
                     Bundle data = new Bundle();
-                    data.putParcelable("partida",partida);
-                    data.putString("campKey",campKey);
+                    data.putParcelable("partida", partida);
+                    data.putString("campKey", campKey);
+                    data.putParcelableArrayList("gols",gols);
                     t.setArguments(data);
-                    openFragment(t);
+                    openFragment(t,"amarelos");
                 } else {
                     Toast.makeText(getContext(), "faltam gols...", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
-    public void openFragment(Fragment fragment){
+
+    public void openFragment(Fragment fragment,String tag) {
         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, fragment);
+        transaction.replace(R.id.container, fragment,tag);
         transaction.addToBackStack(null);
         transaction.commit();
     }

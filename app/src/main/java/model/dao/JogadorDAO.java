@@ -122,6 +122,9 @@ public class JogadorDAO {
             jogador = configurar(times, jogador);
             result2.add(jogador);
         }
+        while(result2.size() > 10){
+            result2.remove(result2.size()-1);
+        }
         return result2;
 
     }
@@ -203,5 +206,14 @@ public class JogadorDAO {
         return result;
     }
 
+    public List<Jogador> listarNaoSuspensos(List<Jogador> time){
+        List<Jogador>result = new ArrayList<>();
+        for (Jogador jogador : time){
+            if(!jogador.isSuspenso()){
+                result.add(jogador);
+            }
+        }
+        return result;
+    }
 
 }

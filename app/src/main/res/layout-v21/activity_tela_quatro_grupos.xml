@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/fundograma2"
+    android:background="@drawable/fundoverde"
     tools:context=".TelaQuatroGrupos">
 
     <LinearLayout
@@ -19,8 +19,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:title="@string/grupos"
-            android:layout_marginBottom="20dp"
-            android:background="@color/colorPrimary" />
+            app:titleTextColor="@android:color/white"
+            android:background="@android:color/black"
+            android:layout_marginBottom="20dp" />
 
 
         <Button
@@ -57,6 +58,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="20dp"
+            android:showDividers="middle"
+            android:divider="@android:color/black"
             android:layout_marginRight="20dp"
             android:layout_marginBottom="30dp"
             android:stretchColumns="*">
@@ -69,33 +72,34 @@
                     android:text="@string/time_maiusculo"
                     android:textColor="@android:color/white"
                     android:textSize="20sp" />
-
                 <TextView
                     android:layout_column="2"
+                    android:padding="3dp"
+                    android:text="@string/j"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
+                <TextView
+                    android:layout_column="3"
                     android:padding="3dp"
                     android:text="@string/pts"
                     android:textColor="@android:color/white"
                     android:textSize="20sp" />
 
                 <TextView
-                    android:layout_column="3"
+                    android:layout_column="4"
                     android:padding="3dp"
                     android:text="@string/sg"
                     android:textColor="@android:color/white"
                     android:textSize="20sp" />
 
                 <TextView
-                    android:layout_column="4"
+                    android:layout_column="5"
                     android:padding="3dp"
                     android:text="@string/gp"
                     android:textColor="@android:color/white"
                     android:textSize="20sp" />
 
             </TableRow>
-
-            <View
-                android:layout_height="2dip"
-                android:background="#FF909090" />
 
         </TableLayout>
 

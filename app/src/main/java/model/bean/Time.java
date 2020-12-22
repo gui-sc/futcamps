@@ -21,6 +21,11 @@ public class Time {
     private int saldo;
     private int golsPro;
     private int golsContra;
+    private int jogos;
+
+    public int getJogos(){return jogos;}
+
+    public void setJogos(int j){jogos = j;}
 
     public String getId() {
         return id;
@@ -158,6 +163,7 @@ public class Time {
         result.put("saldo",saldo);
         result.put("golsPro",golsPro);
         result.put("golsContra",golsContra);
+        result.put("jogos",jogos);
         return result;
 
     }

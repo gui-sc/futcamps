@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -42,7 +43,7 @@ public class TelaEditarTime extends Fragment {
     private String nome, dirigente, cidade;
     private boolean eraCabecaDeChave, primeira = false, segunda = false;
     private List<Usuario> usuarios;
-    private ValueEventListener timeListener, campListener;
+    private ValueEventListener timeListener, campListener,campListener2;
     private Switch swCabecaDeChave;
     private FirebaseUser user;
 
@@ -109,26 +110,35 @@ public class TelaEditarTime extends Fragment {
 
             }
         });
-    }
+        Button btnSalvar = view.findViewById(R.id.btn_salvar);
+        Button btnApagar = view.findViewById(R.id.btn_apagar);
+        btnApagar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ValueEventListener eventListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Campeonato camp = dataSnapshot.getValue(Campeonato.class);
+                        new CampeonatoDAO().excluir(camp,user.getUid(),usuarios);
+                        Intent it = new Intent(getContext(),TelaCamps.class);
+                        it.putExtra("camp",camp);
+                        TelaPrincipalTimes t = (TelaPrincipalTimes)getActivity();
+                        t.startActivity(it);
+                        t.finish();
+                    }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (timeListener != null) {
-            timeReference.removeEventListener(timeListener);
-        }
-        if (campListener != null) {
-            campReference.removeEventListener(campListener);
-        }
-    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                criarActivity();
-                break;
-            case R.id.btn_salvar:
+                    }
+                };
+                campReference.addListenerForSingleValueEvent(eventListener);
+                campListener2 = eventListener;
+            }
+        });
+        btnSalvar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 ValueEventListener mCampListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -175,18 +185,22 @@ public class TelaEditarTime extends Fragment {
                 };
                 campReference.addListenerForSingleValueEvent(mCampListener);
                 campListener = mCampListener;
-        }
-        return super.onOptionsItemSelected(item);
+            }
+        });
     }
 
-
-    private void criarActivity() {
-        Intent it = new Intent(getContext(), TelaEditarCamp.class);
-        it.putExtra("user", user);
-        it.putExtra("campKey", campKey);
-        TelaCamps t = (TelaCamps)getActivity();
-        t.startActivity(it);
-        t.finish();
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (timeListener != null) {
+            timeReference.removeEventListener(timeListener);
+        }
+        if (campListener != null) {
+            campReference.removeEventListener(campListener);
+        }
+        if(campListener2 != null){
+            campReference.removeEventListener(campListener2);
+        }
     }
 
     private boolean valida(String s) {
@@ -201,7 +215,6 @@ public class TelaEditarTime extends Fragment {
         timeDAO.alterar(time, campKey);
         Toast.makeText(getContext(), R.string.timeAlterado, Toast.LENGTH_SHORT).show();
     }
-
 
    /* private void createDrawer() {
         headerNavigation = new AccountHeaderBuilder()

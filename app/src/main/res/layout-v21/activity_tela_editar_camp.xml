@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fundoestadio2"
+    android:background="@drawable/fundoverde"
     tools:context=".TelaEditarCamp">
 
     <LinearLayout
@@ -16,31 +16,34 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
-            app:title="@string/ftc_editar_campeonato"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="50dp"
+            android:background="@android:color/black"
+            app:title="@string/ftc_editar_campeonato"
+            app:titleTextColor="@android:color/white" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="20dp"
             android:gravity="center">
-            <include layout="@layout/info_block"/>
+
+            <include layout="@layout/info_block" />
 
             <ImageButton
                 android:id="@+id/btn_copiar"
+                style="@style/Widget.Futcamps.Button.TextButton"
                 android:layout_width="60dp"
                 android:layout_height="70dp"
+                android:layout_alignParentEnd="true"
                 android:layout_marginTop="7dp"
                 android:layout_marginEnd="10dp"
                 android:contentDescription="@string/grupos"
-                style="@style/Widget.Futcamps.Button.TextButton"
-                android:layout_alignParentEnd="true"
-                android:src="@drawable/copy_32px"
-                />
+                android:src="@drawable/copy_32px" />
 
         </RelativeLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/nome_text_input"
             style="@style/Widget.Futcamps.TextInputLayout"
@@ -48,21 +51,21 @@
             android:layout_height="match_parent"
             android:layout_margin="4dp"
             android:hint="@string/ftc_hint_nome"
-            app:errorEnabled="true"
-            >
+            app:errorEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/nome_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:inputType="text"
-                android:maxLines="1"
-                android:textColor="@android:color/white"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"/>
+                android:layout_marginBottom="10dp"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textColor="@android:color/white" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/cidade_text_input"
             style="@style/Widget.Futcamps.TextInputLayout"
@@ -70,39 +73,38 @@
             android:layout_height="match_parent"
             android:layout_margin="4dp"
             android:hint="@string/ftc_hint_cidade"
-            app:errorEnabled="true"
-            >
+            app:errorEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/cidade_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:inputType="text"
                 android:maxLines="1"
-                android:textColor="@android:color/white"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"/>
+                android:textColor="@android:color/white" />
 
         </com.google.android.material.textfield.TextInputLayout>
-       <!-- <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/times"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:layout_marginStart="20dp"
-            />
+        <!-- <TextView
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:text="@string/times"
+             android:textColor="@android:color/white"
+             android:textSize="18sp"
+             android:layout_marginStart="20dp"
+             />
 
-        <ListView
-            android:id="@+id/lst_times"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:paddingTop="2dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="10dp"
-            tools:ignore="NestedScrolling" />-->
+         <ListView
+             android:id="@+id/lst_times"
+             android:layout_width="match_parent"
+             android:layout_height="100dp"
+             android:paddingTop="2dp"
+             android:layout_marginTop="5dp"
+             android:layout_marginLeft="20dp"
+             android:layout_marginRight="20dp"
+             android:layout_marginBottom="10dp"
+             tools:ignore="NestedScrolling" />-->
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/premiacao_text_input"
@@ -110,23 +112,45 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="4dp"
-            android:hint="@string/ftc_hint_premiacao"
-            >
+            android:hint="@string/ftc_hint_premiacao">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/premiacao_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:inputType="text"
-                android:maxLines="1"
-                android:textColor="@android:color/white"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"/>
+                android:layout_marginBottom="10dp"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textColor="@android:color/white" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
+            <Button
+                android:id="@+id/btn_apagar"
+                style="@style/Widget.Futcamps.Button.DeleteButton"
+                android:layout_margin = "5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/apagar_campeonato"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:layout_alignParentEnd="true"/>
+
+            <Button
+                android:id="@+id/btn_salvar"
+                android:layout_margin="5dp"
+                style="@style/Widget.Futcamps.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ftc_salvar"
+                android:textSize="18sp" />
+        </RelativeLayout>
 
 
     </LinearLayout>

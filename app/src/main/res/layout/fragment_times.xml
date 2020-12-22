@@ -2,29 +2,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fundograma2"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/fundoverde2"
     tools:context="com.example.ehComplicado.TimesFragment">
-
-    <Button
-        android:id="@+id/novo_button"
-        style="@style/Widget.Futcamps.Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/novo_time"
-        android:layout_marginRight="20dp"
-        android:layout_gravity="end"
-        android:textSize="18sp"
-        android:layout_marginEnd="20dp" />
-    <ListView
-        android:id="@+id/lst_times"
-        android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:paddingTop="2dp"
-        android:dividerHeight="10dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="10dp"
-        tools:listitem="@layout/linear_layout_time" />
+  <androidx.appcompat.widget.Toolbar
+      android:id="@+id/toolbar"
+      app:titleTextColor="@android:color/white"
+      android:background="@android:color/black"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:title="Times"
+      android:layout_marginBottom="20dp"
+      />
+  <Button
+      android:id="@+id/novo_button"
+      style="@style/Widget.Futcamps.Button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/novo_time"
+      android:layout_marginRight="20dp"
+      android:layout_gravity="end"
+      android:layout_marginTop="70dp"
+      android:textSize="18sp"
+      android:layout_marginEnd="20dp" />
+  <ListView
+      android:id="@+id/lst_times"
+      android:layout_width="match_parent"
+      android:layout_height="400dp"
+      android:paddingTop="2dp"
+      android:dividerHeight="10dp"
+      android:layout_marginTop="150dp"
+      android:layout_marginLeft="20dp"
+      android:layout_marginRight="20dp"
+      android:layout_marginBottom="10dp"
+      tools:listitem="@layout/linear_layout_time" />
 
 </FrameLayout>

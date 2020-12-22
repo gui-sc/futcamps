@@ -14,9 +14,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import model.bean.Campeonato;
 
 public class TelaPrincipalTimes extends AppCompatActivity
-implements BottomNavigationView.OnNavigationItemSelectedListener{
-private Campeonato camp;
-private String timeKey;
+        implements BottomNavigationView.OnNavigationItemSelectedListener{
+    private Campeonato camp;
+    private String timeKey;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

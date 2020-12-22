@@ -3,8 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fundograma2"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/fundoverde2"
     tools:context=".JogadoresFragment">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        app:titleTextColor="@android:color/white"
+        android:background="@android:color/black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="Jogadores"
+        android:layout_marginBottom="20dp"
+        />
     <Button
         android:id="@+id/salvar_button"
         style="@style/Widget.Futcamps.Button"
@@ -15,14 +25,15 @@
         android:layout_gravity="end"
         android:layout_marginRight="20dp"
         android:layout_marginEnd="20dp"
-       />
+        android:layout_marginTop="70dp"
+        />
     <ListView
         android:id="@+id/lst_jogadores"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="150dp"
         android:paddingTop="1dp"
         tools:ignore="NestedScrolling" />
 

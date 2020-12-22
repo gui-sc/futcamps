@@ -179,4 +179,5 @@
     <string name="avisoCaracteres">Your password must contain at least 6 characters…</string>
     <string name="faseMataMata">Knockout round</string>
     <string name="mata_mata"><![CDATA[Knockout round ->]]></string>
+    <string name="j">G</string>
 </resources>

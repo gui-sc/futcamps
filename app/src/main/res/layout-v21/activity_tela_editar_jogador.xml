@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fundograma2"
+    android:background="@drawable/fundoverde"
     tools:context=".TelaEditarJogador">
 
   <LinearLayout
@@ -20,7 +20,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:background="@color/colorPrimary" />
+        app:titleTextColor="@android:color/white"
+        android:background="@android:color/black" />
 
     <TextView
         android:id="@+id/lbl_time"
@@ -116,6 +117,7 @@
           android:layout_margin="5dp"
           android:layout_alignParentEnd="true"
           android:text="@string/ftc_apagar_jogador"
+          android:textColor="@android:color/black"
           android:id="@+id/deletar_button"/>
 
     </RelativeLayout>

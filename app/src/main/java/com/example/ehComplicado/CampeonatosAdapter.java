@@ -51,11 +51,9 @@ public class CampeonatosAdapter extends BaseAdapter {
         }else if (campeonato.isFinalizado()){
             situacao.setText(R.string.ftc_finalizado);
             situacao.setTextColor(Color.RED);
-        }else if(campeonato.isFaseDeGrupos() || campeonato.isOitavas() || campeonato.isQuartas() || campeonato.isSemi() || campeonato.isFinal()){
+        }else{
             situacao.setText(R.string.ftc_td_ok);
             situacao.setTextColor(Color.BLUE);
-        }else{
-            situacao.setText(R.string.ftc_nao_ini);
         }
         nomeCamp.setText(campeonato.getNome());
         String builder = campeonato.getAno() +

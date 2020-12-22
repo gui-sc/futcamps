@@ -127,7 +127,7 @@
     <string name="ftc_menor" translatable="false"><![CDATA[<]]></string>
     <string name="ftc_maior" translatable="false"><![CDATA[>]]></string>
     <string name="default_notification_channel_id" translatable="false">CHANNEL_ID</string>
-    <string name="ftc_td_ok">Tudo Pronto</string>
+    <string name="ftc_td_ok">Aguardando início</string>
     <string name="ftc_em_and">Em Andamento</string>
     <string name="ftc_nao_ini">Não Iniciado</string>
     <string name="title_activity_main" translatable="false">FutCamps</string>
@@ -237,4 +237,6 @@
     <string name="avisoCaracteres">Sua senha deve conter no mínimo 6 caracteres…</string>
     <string name="faseMataMata">Fase de mata-mata</string>
     <string name="mata_mata"><![CDATA[Mata-mata ->]]></string>
+    <string name="apagar_campeonato">Apagar Campeonato</string>
+    <string name="j">J</string>
 </resources>

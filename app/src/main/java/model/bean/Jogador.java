@@ -1,9 +1,12 @@
 package model.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class Jogador {
+public class Jogador implements Parcelable {
     private String id;
     private String idTime;
     private String nome;
@@ -118,6 +121,7 @@ public class Jogador {
         result.put("nome",nome);
         result.put("suspenso",suspenso);
         result.put("idTime",idTime);
+        result.put("pendurado",pendurado);
         return result;
     }
 
@@ -128,6 +132,52 @@ public class Jogador {
         }else {
             return apelido + " - "+ time.getNome();
         }
+    }
+
+
+    private Jogador(Parcel p){
+        id = p.readString();
+        apelido = p.readString();
+        ca = p.readInt();
+        cv = p.readInt();
+        gols = p.readInt();
+        dataNasc = p.readString();
+        nome = p.readString();
+        suspenso = p.readInt() == 1;
+        idTime = p.readString();
+        pendurado = p.readInt()==1;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(apelido);
+        dest.writeInt(ca);
+        dest.writeInt(cv);
+        dest.writeInt(gols);
+        dest.writeString(dataNasc);
+        dest.writeString(nome);
+        dest.writeInt(suspenso?1:0);
+        dest.writeString(idTime);
+        dest.writeInt(pendurado?1:0);
+    }
+
+    public static final Parcelable.Creator
+    CREATOR = new Creator() {
+        @Override
+        public Object createFromParcel(Parcel source) {
+            return new Jogador(source);
+        }
+
+        @Override
+        public Object[] newArray(int size) {
+            return new Jogador[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
 

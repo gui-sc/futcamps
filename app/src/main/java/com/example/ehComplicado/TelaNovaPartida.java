@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +25,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 import java.util.List;
 import model.bean.Campeonato;
 import model.bean.Jogador;
@@ -186,11 +190,10 @@ public class TelaNovaPartida extends Fragment {
         jogadorReference = FirebaseDatabase.getInstance().getReference()
                 .child("time-jogadores").child(partida.getIdVisitante());
         JogadorHelper jogadorHelperTime2 = new JogadorHelper(jogadorReference);
-        time1 = jogadorHelperTime1.retrive();
-        time2 = jogadorHelperTime2.retrive();
-        JogadorHelper jogadorHelper = new JogadorHelper(jogadorRef);
-        Resultados resultados = new Resultados();
-        List<Jogador> jogadores1 = jogadorHelper.retrive();
+        List<Jogador> jogadores1 = jogadorHelperTime1.retrive();
+        List<Jogador> jogadores2 = jogadorHelperTime2.retrive();
+        time1 = jogadorDAO.listarNaoSuspensos(jogadores1);
+        time2 = jogadorDAO.listarNaoSuspensos(jogadores2);
         Button btnSalvar = view.findViewById(R.id.salvar_button);
         btnSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -278,15 +281,15 @@ public class TelaNovaPartida extends Fragment {
         ValueEventListener mCampListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                camp = dataSnapshot.getValue(Campeonato.class);
-                List<Jogador> jogadores1 = jogadorDAO.listarSuspensosTime(time1);
-                List<Jogador> jogadores2 = jogadorDAO.listarSuspensosTime(time2);
-                for (Jogador jogador : jogadores1) {
+                List<Jogador> jogadoresTime1 = jogadorDAO.listarSuspensosTime(time1);
+                List<Jogador> jogadoresTime2 = jogadorDAO.listarSuspensosTime(time2);
+                for (Jogador jogador : jogadoresTime1) {
                     jogadorDAO.cumpriuSuspensao(jogador, partida.getIdMandante(), campKey);
                 }
-                for (Jogador jogador : jogadores2) {
+                for (Jogador jogador : jogadoresTime2) {
                     jogadorDAO.cumpriuSuspensao(jogador, partida.getIdVisitante(), campKey);
                 }
+                camp = dataSnapshot.getValue(Campeonato.class);
                 partida.setNomeMandante(String.valueOf(lblMandante.getText()));
                 partida.setNomeVisitante(String.valueOf(lblVisitante.getText()));
                 partida.setLocal(estadio);
@@ -305,14 +308,14 @@ public class TelaNovaPartida extends Fragment {
                     data.putString("campKey",campKey);
                     data.putParcelable("partida",partida);
                     t.setArguments(data);
-                    openFragment(t);
+                    openFragment(t,"amarelos");
                 } else {
                     TelaGols t = new TelaGols();
                     Bundle data = new Bundle();
                     data.putString("campKey",campKey);
                     data.putParcelable("partida",partida);
                     t.setArguments(data);
-                    openFragment(t);
+                    openFragment(t,"gols");
                 }
             }
 
@@ -325,20 +328,20 @@ public class TelaNovaPartida extends Fragment {
         campListener = mCampListener;
     }
 
-    public void openFragment(Fragment fragment){
+    public void openFragment(Fragment fragment,String tag){
         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, fragment);
+        transaction.replace(R.id.container, fragment,tag);
         transaction.addToBackStack(null);
         transaction.commit();
     }
 
     private void cadastroMataMata() {
-        List<Jogador> jogadores1 = jogadorDAO.listarSuspensosTime(time1);
-        List<Jogador> jogadores2 = jogadorDAO.listarSuspensosTime(time2);
-        for (Jogador jogador : jogadores1) {
+        List<Jogador> jogadoresTime1 = jogadorDAO.listarSuspensosTime(time1);
+        List<Jogador> jogadoresTime2 = jogadorDAO.listarSuspensosTime(time2);
+        for (Jogador jogador : jogadoresTime1) {
             jogadorDAO.cumpriuSuspensao(jogador, partida.getIdMandante(), campKey);
         }
-        for (Jogador jogador : jogadores2) {
+        for (Jogador jogador : jogadoresTime2) {
             jogadorDAO.cumpriuSuspensao(jogador, partida.getIdVisitante(), campKey);
         }
         partida.setLocal(estadio);
@@ -358,15 +361,19 @@ public class TelaNovaPartida extends Fragment {
             Bundle data = new Bundle();
             data.putString("campKey",campKey);
             data.putParcelable("partida",partida);
+            data.putParcelableArrayList("time1", (ArrayList<? extends Parcelable>) time1);
+            data.putParcelableArrayList("time2", (ArrayList<? extends Parcelable>) time2);
             t.setArguments(data);
-            openFragment(t);
+            openFragment(t,"amarelos");
         } else {
             TelaGols t = new TelaGols();
             Bundle data = new Bundle();
             data.putString("campKey",campKey);
             data.putParcelable("partida",partida);
+            data.putParcelableArrayList("time1", (ArrayList<? extends Parcelable>) time1);
+            data.putParcelableArrayList("time2", (ArrayList<? extends Parcelable>) time2);
             t.setArguments(data);
-            openFragment(t);
+            openFragment(t,"gols");
         }
 
     }

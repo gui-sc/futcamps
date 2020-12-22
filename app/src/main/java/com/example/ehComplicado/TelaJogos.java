@@ -143,7 +143,7 @@ public class TelaJogos extends Fragment {
                             if (camp.getNumGrupos() > 0) {
                                 lblAtual.setText(R.string.faseDeGrupos);
                                 partidasGrupos = partidaDAO.listarFase(partidas1, "grupos");
-                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, partidasGrupos);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, partidasGrupos);
                                 lstJogos.setAdapter(adapter);
                             }
                         } else if (lblAtual.getText().equals(getString(R.string.Quartas))) {
@@ -151,12 +151,12 @@ public class TelaJogos extends Fragment {
                                     (camp.getNumGrupos() == 2 && (camp.getClassificados() == 3 || camp.getClassificados() == 4))) {
                                 lblAtual.setText(getString(R.string.faseDeGrupos));
                                 partidasGrupos = partidaDAO.listarFase(partidas1, "grupos");
-                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, partidasGrupos);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, partidasGrupos);
                             } else {
                                 if (camp.getNumGrupos() == 0 && camp.getNumTimes() > 8) {
                                     lblAtual.setText(getString(R.string.oitavas));
                                     oitavas = partidaDAO.listarFase(partidas1, "oitavas");
-                                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, oitavas);
+                                    adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, oitavas);
                                     lstJogos.setAdapter(adapter);
                                 }
                             }
@@ -165,40 +165,40 @@ public class TelaJogos extends Fragment {
                                 if (camp.getClassificados() == 2) {
                                     lblAtual.setText(getString(R.string.faseDeGrupos));
                                     partidasGrupos = partidaDAO.listarFase(partidas1, "grupos");
-                                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, partidasGrupos);
+                                    adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, partidasGrupos);
 
                                 } else {
                                     lblAtual.setText(getString(R.string.Quartas));
                                     quartas = partidaDAO.listarFase(partidas1, "quartas");
-                                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
+                                    adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, quartas);
                                     lstJogos.setAdapter(adapter);
                                 }
                             } else if (camp.getNumGrupos() == 4) {
                                 if (camp.getClassificados() == 1) {
                                     lblAtual.setText(R.string.faseDeGrupos);
-                                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, partidasGrupos);
+                                    adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, partidasGrupos);
                                 } else {
                                     lblAtual.setText(getString(R.string.Quartas));
                                     quartas = partidaDAO.listarFase(partidas1, "quartas");
-                                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
+                                    adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, quartas);
                                     lstJogos.setAdapter(adapter);
                                 }
                             } else {
                                 lblAtual.setText(getString(R.string.Quartas));
                                 quartas = partidaDAO.listarFase(partidas1, "quartas");
-                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, quartas);
                                 lstJogos.setAdapter(adapter);
                             }
                         } else if (lblAtual.getText().equals(getString(R.string.Final))) {
                             if (camp.getNumGrupos() == 2 && camp.getClassificados() == 1) {
                                 lblAtual.setText(getString(R.string.faseDeGrupos));
                                 partidasGrupos = partidaDAO.listarFase(partidas1, "grupos");
-                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, partidasGrupos);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, partidasGrupos);
 
                             } else {
                                 lblAtual.setText(getString(R.string.Semi));
                                 semi = partidaDAO.listarFase(partidas1, "semi");
-                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, semi);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, semi);
                                 lstJogos.setAdapter(adapter);
                                 lblDepois.setVisibility(View.VISIBLE);
                             }
@@ -227,17 +227,17 @@ public class TelaJogos extends Fragment {
                                     if (camp.getClassificados() == 3 || camp.getClassificados() == 4) {
                                         lblAtual.setText(getString(R.string.oitavas));
                                         oitavas = partidaDAO.listarFase(partidas1, "oitavas");
-                                        adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, oitavas);
+                                        adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, oitavas);
                                         lstJogos.setAdapter(adapter);
                                     } else if (camp.getClassificados() == 2) {
                                         lblAtual.setText(getString(R.string.Quartas));
                                         quartas = partidaDAO.listarFase(partidas1, "quartas");
-                                        adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
+                                        adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, quartas);
                                         lstJogos.setAdapter(adapter);
                                     } else {
                                         lblAtual.setText(R.string.Semi);
                                         semi = partidaDAO.listarFase(partidas1, "semi");
-                                        adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, semi);
+                                        adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, semi);
                                         lstJogos.setAdapter(adapter);
                                     }
                                 }
@@ -247,17 +247,17 @@ public class TelaJogos extends Fragment {
                                     if (camp.getClassificados() == 3 || camp.getClassificados() == 4) {
                                         lblAtual.setText(R.string.Quartas);
                                         quartas = partidaDAO.listarFase(partidas1, "quartas");
-                                        adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
+                                        adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, quartas);
                                         lstJogos.setAdapter(adapter);
                                     } else if (camp.getClassificados() == 2) {
                                         lblAtual.setText(getString(R.string.Semi));
                                         semi = partidaDAO.listarFase(partidas1, "semi");
-                                        adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, semi);
+                                        adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, semi);
                                         lstJogos.setAdapter(adapter);
                                     } else {
                                         lblAtual.setText(R.string.ftc_final);
                                         Final = partidaDAO.listarFase(partidas1, "final");
-                                        adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, Final);
+                                        adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, Final);
                                         lstJogos.setAdapter(adapter);
                                     }
                                 }
@@ -267,21 +267,21 @@ public class TelaJogos extends Fragment {
                             if (!camp.isOitavas()) {
                                 lblAtual.setText(getString(R.string.Quartas));
                                 quartas = partidaDAO.listarFase(partidas1, "quartas");
-                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, quartas);
                                 lstJogos.setAdapter(adapter);
                             }
                         } else if (lblAtual.getText().equals(getString(R.string.Quartas))) {
                             if (!camp.isQuartas()) {
                                 lblAtual.setText(getString(R.string.Semi));
                                 semi = partidaDAO.listarFase(partidas1, "semi");
-                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, semi);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, semi);
                                 lstJogos.setAdapter(adapter);
                             }
                         } else if (lblAtual.getText().equals(getString(R.string.Semi))) {
                             if (!camp.isSemi()) {
                                 lblAtual.setText(getString(R.string.Final));
                                 Final = partidaDAO.listarFase(partidas1, "final");
-                                adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, Final);
+                                adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, Final);
                                 lstJogos.setAdapter(adapter);
                                 lblDepois.setVisibility(View.INVISIBLE);
                             }
@@ -306,27 +306,27 @@ public class TelaJogos extends Fragment {
                 if (camp.isFaseDeGrupos()) {
                     lblAtual.setText(R.string.faseDeGrupos);
                     partidasGrupos = partidaDAO.listarFase(partidas1, "grupos");
-                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, partidasGrupos);
+                    adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, partidasGrupos);
                     lstJogos.setAdapter(adapter);
                 } else if (camp.isOitavas()) {
                     lblAtual.setText(getString(R.string.oitavas));
                     oitavas = partidaDAO.listarFase(partidas1, "oitavas");
-                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, oitavas);
+                    adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, oitavas);
                     lstJogos.setAdapter(adapter);
                 } else if (camp.isQuartas()) {
                     lblAtual.setText(getString(R.string.Quartas));
                     quartas = partidaDAO.listarFase(partidas1, "quartas");
-                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, quartas);
+                    adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, quartas);
                     lstJogos.setAdapter(adapter);
                 } else if (camp.isSemi()) {
                     lblAtual.setText(getString(R.string.Semi));
                     semi = partidaDAO.listarFase(partidas1, "semi");
-                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, semi);
+                    adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, semi);
                     lstJogos.setAdapter(adapter);
                 } else {
                     lblAtual.setText(getString(R.string.Final));
                     Final = partidaDAO.listarFase(partidas1, "final");
-                    adapter = new ArrayAdapter<>(getContext(), R.layout.personalizado_list_item, Final);
+                    adapter = new ArrayAdapter<>(getContext(), R.layout.simples_list_item, Final);
                     lstJogos.setAdapter(adapter);
                     lblDepois.setVisibility(View.INVISIBLE);
                 }
